@@ -12,193 +12,293 @@ export default function MyClaims({ user, onBack }) {
     });
   }, []);
 
-  const getStatusStyle = (status) => {
-    if (status === "approved") return styles.badgeApproved;
-    if (status === "rejected") return styles.badgeRejected;
-    return styles.badgePending;
+  const getStatusPillStyle = (status) => {
+    if (status === "approved") return { ...s.pill, ...s.pillApproved };
+    if (status === "rejected") return { ...s.pill, ...s.pillRejected };
+    return { ...s.pill, ...s.pillPending };
   };
 
-  const getStatusIcon = (status) => {
-    if (status === "approved") return "✅";
-    if (status === "rejected") return "❌";
-    return "⏳";
-  };
+  const pendingCount = claims.filter((c) => c.status === "pending").length;
+  const approvedCount = claims.filter((c) => c.status === "approved").length;
+  const rejectedCount = claims.filter((c) => c.status === "rejected").length;
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <button style={styles.backBtn} onClick={onBack}>
-          ← Back
-        </button>
-        <h2 style={styles.title}>My Claims</h2>
-        <span style={styles.userBadge}>👤 {user.name}</span>
+    <div style={s.page}>
+      {/* ── Navbar ── */}
+      <nav style={s.nav}>
+        <div style={s.navLeft}>
+          <div style={s.nuCircle}>
+            <span style={s.nuText}>NU</span>
+          </div>
+          <div style={s.navDiv} />
+          <span style={s.brand}>I-FAST</span>
+          <span style={s.navSub}>Lost &amp; Found Portal</span>
+        </div>
+        <div style={s.navRight}>
+          <span style={s.userLabel}>
+            {user.name} ({user.role})
+          </span>
+          <button style={s.backBtn} onClick={onBack}>
+            ← Back to Items
+          </button>
+        </div>
+      </nav>
+
+      {/* ── Body ── */}
+      <div style={s.body}>
+        {/* Page header */}
+        <div style={s.pageHead}>
+          <div>
+            <h2 style={s.pageTitle}>My Claims</h2>
+            <p style={s.pageSub}>Track all your submitted item claims</p>
+          </div>
+          <span style={s.adminBadge}>{user.name}</span>
+        </div>
+
+        {/* Stats */}
+        {!loading && claims.length > 0 && (
+          <div style={s.statsRow}>
+            {[
+              { val: claims.length, lbl: "Total claims" },
+              { val: pendingCount, lbl: "Pending", warn: pendingCount > 0 },
+              { val: approvedCount, lbl: "Approved" },
+              { val: rejectedCount, lbl: "Rejected" },
+            ].map(({ val, lbl, warn }) => (
+              <div key={lbl} style={s.statCard}>
+                <div style={{ ...s.statVal, ...(warn ? s.statWarn : {}) }}>
+                  {val}
+                </div>
+                <div style={s.statLbl}>{lbl}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Section label */}
+        {!loading && claims.length > 0 && (
+          <p style={s.sectionLbl}>All claims</p>
+        )}
+
+        {/* Loading */}
+        {loading && <p style={s.empty}>Loading...</p>}
+
+        {/* Empty state */}
+        {!loading && claims.length === 0 && (
+          <div style={s.emptyBox}>
+            <div style={s.emptyIcon}>📭</div>
+            <p style={s.emptyTitle}>No claims yet</p>
+            <p style={s.emptySub}>
+              Browse items and click "Claim This" to submit one.
+            </p>
+          </div>
+        )}
+
+        {/* Claims list */}
+        {!loading && claims.length > 0 && (
+          <div style={s.list}>
+            {claims.map((claim) => (
+              <div key={claim.claim_id} style={s.card}>
+                <div style={s.cardTop}>
+                  <div>
+                    <p style={s.cardItemTag}>Item</p>
+                    <h3 style={s.cardItemName}>{claim.title}</h3>
+                    <p style={s.cardMeta}>📍 {claim.location_found}</p>
+                    <p style={s.cardMeta}>
+                      🕐 Submitted:{" "}
+                      {new Date(claim.submitted_at).toLocaleString()}
+                    </p>
+                  </div>
+                  <span style={getStatusPillStyle(claim.status)}>
+                    {claim.status.charAt(0).toUpperCase() +
+                      claim.status.slice(1)}
+                  </span>
+                </div>
+
+                <div style={s.divider} />
+
+                <div style={s.proofBox}>
+                  <p style={s.proofLabel}>Your ownership proof</p>
+                  <p style={s.proofText}>"{claim.claim_description}"</p>
+                </div>
+
+                {claim.status === "approved" && (
+                  <div style={s.noteApproved}>
+                    Your claim was approved — visit Student Affairs to collect
+                    your item.
+                  </div>
+                )}
+                {claim.status === "rejected" && (
+                  <div style={s.noteRejected}>
+                    Your claim was not approved. Contact Student Affairs for
+                    more information.
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      {loading ? (
-        <p style={styles.empty}>Loading...</p>
-      ) : claims.length === 0 ? (
-        <div style={styles.emptyBox}>
-          <p style={styles.emptyIcon}>📭</p>
-          <p style={styles.emptyText}>You haven't submitted any claims yet.</p>
-          <p style={styles.emptyHint}>
-            Browse items and click "Claim This" to submit one.
-          </p>
-        </div>
-      ) : (
-        <div style={styles.list}>
-          {claims.map((claim) => (
-            <div key={claim.claim_id} style={styles.card}>
-              <div style={styles.cardTop}>
-                <div>
-                  <h3 style={styles.itemTitle}>{claim.title}</h3>
-                  <p style={styles.itemMeta}>📍 {claim.location_found}</p>
-                  <p style={styles.itemMeta}>
-                    🕐 Submitted:{" "}
-                    {new Date(claim.submitted_at).toLocaleString()}
-                  </p>
-                </div>
-                <span style={getStatusStyle(claim.status)}>
-                  {getStatusIcon(claim.status)} {claim.status.toUpperCase()}
-                </span>
-              </div>
-              <div style={styles.descSection}>
-                <p style={styles.descLabel}>Your claim description</p>
-                <p style={styles.descText}>"{claim.claim_description}"</p>
-              </div>
-              {claim.status === "approved" && (
-                <div style={styles.approvedNote}>
-                  🎉 Your claim was approved! Visit Student Affairs to collect
-                  your item.
-                </div>
-              )}
-              {claim.status === "rejected" && (
-                <div style={styles.rejectedNote}>
-                  Your claim was not approved. Contact Student Affairs for more
-                  information.
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
 
-const styles = {
-  container: {
-    padding: "32px",
-    backgroundColor: "#f0f2f5",
-    minHeight: "100vh",
-  },
-  header: {
+const s = {
+  page: { backgroundColor: "#eef2f9", minHeight: "100vh" },
+  nav: {
+    backgroundColor: "#0c2d6b",
+    padding: "10px 24px",
     display: "flex",
     alignItems: "center",
-    gap: "16px",
-    marginBottom: "28px",
+    justifyContent: "space-between",
   },
-  title: { margin: 0, color: "#1a1a2e", flex: 1 },
-  backBtn: {
-    background: "none",
-    border: "1px solid #ddd",
-    padding: "6px 12px",
-    borderRadius: "6px",
-    cursor: "pointer",
-    fontSize: "13px",
-    color: "#555",
-  },
-  userBadge: {
-    fontSize: "14px",
-    color: "#555",
-    backgroundColor: "white",
-    padding: "8px 14px",
-    borderRadius: "8px",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
-  },
-  empty: { color: "#888", textAlign: "center", marginTop: "60px" },
-  emptyBox: { textAlign: "center", marginTop: "80px" },
-  emptyIcon: { fontSize: "48px", margin: "0 0 12px" },
-  emptyText: { color: "#555", fontSize: "16px", margin: "0 0 8px" },
-  emptyHint: { color: "#888", fontSize: "14px" },
-  list: {
+  navLeft: { display: "flex", alignItems: "center", gap: 10 },
+  nuCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    backgroundColor: "#0c2d6b",
+    border: "2px solid #1a9e75",
     display: "flex",
-    flexDirection: "column",
-    gap: "16px",
-    maxWidth: "680px",
-    margin: "0 auto",
+    alignItems: "center",
+    justifyContent: "center",
   },
+  nuText: { fontSize: 11, fontWeight: "500", color: "#fff" },
+  navDiv: { width: 1, height: 26, backgroundColor: "rgba(255,255,255,0.2)" },
+  brand: { color: "#fff", fontSize: 14, fontWeight: "500", letterSpacing: 1 },
+  navSub: { color: "rgba(255,255,255,0.45)", fontSize: 11, marginLeft: 2 },
+  navRight: { display: "flex", alignItems: "center", gap: 10 },
+  userLabel: { color: "rgba(255,255,255,0.6)", fontSize: 11 },
+  backBtn: {
+    padding: "5px 14px",
+    borderRadius: 6,
+    fontSize: 11,
+    background: "rgba(255,255,255,0.1)",
+    color: "#fff",
+    border: "none",
+    cursor: "pointer",
+  },
+  body: { padding: 24 },
+  pageHead: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+  },
+  pageTitle: { fontSize: 18, fontWeight: "500", color: "#0c2d6b", margin: 0 },
+  pageSub: { fontSize: 12, color: "#9aa5be", marginTop: 2, marginBottom: 0 },
+  adminBadge: {
+    backgroundColor: "#e6edf9",
+    color: "#0c2d6b",
+    padding: "6px 14px",
+    borderRadius: 20,
+    fontSize: 12,
+    fontWeight: "500",
+  },
+  statsRow: {
+    display: "grid",
+    gridTemplateColumns: "repeat(4,1fr)",
+    gap: 10,
+    marginBottom: 20,
+  },
+  statCard: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    border: "0.5px solid #c8d8f0",
+    padding: "12px 14px",
+  },
+  statVal: { fontSize: 22, fontWeight: "500", color: "#0c2d6b" },
+  statWarn: { color: "#854f0b" },
+  statLbl: { fontSize: 11, color: "#6b7a99", marginTop: 2 },
+  sectionLbl: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: "#4a5878",
+    letterSpacing: "0.5px",
+    textTransform: "uppercase",
+    marginBottom: 12,
+  },
+  empty: { color: "#9aa5be", textAlign: "center", marginTop: 60 },
+  emptyBox: { textAlign: "center", marginTop: 80 },
+  emptyIcon: { fontSize: 36, marginBottom: 10 },
+  emptyTitle: {
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#0c2d6b",
+    marginBottom: 4,
+  },
+  emptySub: { fontSize: 13, color: "#9aa5be" },
+  list: { display: "flex", flexDirection: "column", gap: 12 },
   card: {
-    backgroundColor: "white",
-    borderRadius: "12px",
-    padding: "24px",
-    boxShadow: "0 1px 8px rgba(0,0,0,0.08)",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    border: "0.5px solid #c8d8f0",
+    padding: "18px 20px",
   },
   cardTop: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: "16px",
+    marginBottom: 12,
   },
-  itemTitle: { margin: "0 0 6px", color: "#1a1a2e", fontSize: "18px" },
-  itemMeta: { margin: "3px 0", color: "#666", fontSize: "13px" },
-  badgePending: {
-    backgroundColor: "#fff3cd",
-    color: "#856404",
-    padding: "6px 14px",
-    borderRadius: "20px",
-    fontSize: "13px",
-    fontWeight: "600",
-    whiteSpace: "nowrap",
-  },
-  badgeApproved: {
-    backgroundColor: "#e6f4ea",
-    color: "#2d7a3a",
-    padding: "6px 14px",
-    borderRadius: "20px",
-    fontSize: "13px",
-    fontWeight: "600",
-    whiteSpace: "nowrap",
-  },
-  badgeRejected: {
-    backgroundColor: "#fdecea",
-    color: "#c0392b",
-    padding: "6px 14px",
-    borderRadius: "20px",
-    fontSize: "13px",
-    fontWeight: "600",
-    whiteSpace: "nowrap",
-  },
-  descSection: {
-    backgroundColor: "#f8f9fa",
-    borderRadius: "8px",
-    padding: "14px",
-    marginBottom: "12px",
-  },
-  descLabel: {
-    fontSize: "11px",
-    color: "#888",
+  cardItemTag: {
+    fontSize: 10,
+    color: "#6b7a99",
     textTransform: "uppercase",
     letterSpacing: "0.5px",
-    margin: "0 0 6px",
+    marginBottom: 4,
   },
-  descText: {
-    margin: 0,
-    color: "#444",
-    fontSize: "14px",
-    lineHeight: "1.6",
+  cardItemName: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#1a1a2e",
+    marginBottom: 4,
+  },
+  cardMeta: { fontSize: 11, color: "#9aa5be", marginBottom: 2 },
+  pill: {
+    padding: "3px 12px",
+    borderRadius: 20,
+    fontSize: 11,
+    fontWeight: "500",
+    whiteSpace: "nowrap",
+  },
+  pillPending: { backgroundColor: "#faeeda", color: "#633806" },
+  pillApproved: { backgroundColor: "#e6f4ea", color: "#27500a" },
+  pillRejected: { backgroundColor: "#fcebeb", color: "#a32d2d" },
+  divider: { height: "0.5px", backgroundColor: "#eef2f9", margin: "12px 0" },
+  proofBox: {
+    backgroundColor: "#f8faff",
+    borderRadius: 7,
+    padding: 12,
+    marginBottom: 12,
+    border: "0.5px solid #e0e8f4",
+  },
+  proofLabel: {
+    fontSize: 10,
+    color: "#6b7a99",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
+    marginBottom: 6,
+    fontWeight: "500",
+  },
+  proofText: {
+    fontSize: 12,
+    color: "#4a5878",
+    lineHeight: 1.6,
     fontStyle: "italic",
+    margin: 0,
   },
-  approvedNote: {
+  noteApproved: {
     backgroundColor: "#e6f4ea",
-    color: "#2d7a3a",
-    padding: "12px",
-    borderRadius: "8px",
-    fontSize: "13px",
+    color: "#27500a",
+    padding: "10px 14px",
+    borderRadius: 7,
+    fontSize: 12,
   },
-  rejectedNote: {
-    backgroundColor: "#fdecea",
-    color: "#c0392b",
-    padding: "12px",
-    borderRadius: "8px",
-    fontSize: "13px",
+  noteRejected: {
+    backgroundColor: "#fcebeb",
+    color: "#a32d2d",
+    padding: "10px 14px",
+    borderRadius: 7,
+    fontSize: 12,
   },
 };
