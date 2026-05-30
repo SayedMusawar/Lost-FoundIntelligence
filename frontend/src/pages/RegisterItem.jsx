@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { getCategories, registerItem } from "../api/client";
+import { c, tr, g } from "../theme";
 
-const FAST_LOCATIONS = [
+const LOCATIONS = [
   "Room 1",
   "Room 2",
   "Room 3",
@@ -30,7 +31,7 @@ const FAST_LOCATIONS = [
   "Other",
 ];
 
-export default function RegisterItem({ user, onBack }) {
+export default function RegisterItem({ user }) {
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
     title: "",
@@ -48,8 +49,8 @@ export default function RegisterItem({ user, onBack }) {
     getCategories().then((r) => setCategories(r.data));
   }, []);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const set = (e) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async () => {
     if (
@@ -59,14 +60,14 @@ export default function RegisterItem({ user, onBack }) {
       !form.location_found ||
       !form.found_at
     ) {
-      setError("Please fill in all required fields");
+      setError("Please fill in all required fields.");
       return;
     }
     if (form.location_found === "Other" && !form.location_other.trim()) {
-      setError("Please describe the location");
+      setError("Please describe the specific location.");
       return;
     }
-    const finalLocation =
+    const finalLoc =
       form.location_found === "Other"
         ? form.location_other
         : form.location_found;
@@ -76,7 +77,7 @@ export default function RegisterItem({ user, onBack }) {
         title: form.title,
         description: form.description,
         category_id: parseInt(form.category_id),
-        location_found: finalLocation,
+        location_found: finalLoc,
         found_at: new Date(form.found_at).toISOString(),
         submitted_by: null,
       });
@@ -90,6 +91,7 @@ export default function RegisterItem({ user, onBack }) {
         location_other: "",
         found_at: "",
       });
+      setTimeout(() => setSuccess(false), 4000);
     } catch {
       setError("Failed to register item. Please try again.");
     } finally {
@@ -97,93 +99,102 @@ export default function RegisterItem({ user, onBack }) {
     }
   };
 
+  const inp = {
+    width: "100%",
+    padding: "11px 14px",
+    background: c.bg3,
+    border: `1px solid ${c.border}`,
+    borderRadius: 8,
+    fontSize: 14,
+    color: c.text,
+    transition: tr,
+    boxSizing: "border-box",
+  };
+
   return (
-    <div style={s.page}>
-      {/* ── Navbar ── */}
-      <nav style={s.nav}>
-        <div style={s.navLeft}>
-          <div style={s.nuCircle}>
-            <span style={s.nuText}>NU</span>
-          </div>
-          <div style={s.navDiv} />
-          <span style={s.brand}>I-FAST</span>
-          <span style={s.navSub}>Lost &amp; Found Portal</span>
-        </div>
-        <button style={s.backBtn} onClick={onBack}>
-          ← Back to Items
-        </button>
-      </nav>
+    <div className="fade-up">
+      <div style={{ marginBottom: 28 }}>
+        <h1
+          style={{
+            fontFamily: c.fh,
+            fontSize: 26,
+            fontWeight: 700,
+            color: c.text,
+            marginBottom: 6,
+          }}
+        >
+          Register Found Item
+        </h1>
+        <p style={{ fontSize: 13, color: c.text2 }}>
+          Record an item found on campus —{" "}
+          <span style={{ color: c.teal }}>{user.name}</span>
+        </p>
+      </div>
 
-      {/* ── Body ── */}
-      <div style={s.body}>
-        <div style={s.card}>
-          <div style={s.cardHead}>
-            <h2 style={s.cardTitle}>Register Found Item</h2>
-            <span style={s.staffBadge}>Staff: {user.name}</span>
-          </div>
-          <p style={s.cardSub}>
-            Fill in the details of the item found on campus
-          </p>
-
+      <div style={{ maxWidth: 600 }}>
+        <div style={{ ...g.card, borderRadius: 16 }}>
           {success && (
-            <div style={s.successBox}>
-              ✓ Item registered successfully! You can register another below.
+            <div style={{ ...g.alert("success"), marginBottom: 24 }}>
+              ✓ Item registered successfully!
             </div>
           )}
-          {error && <div style={s.errorBox}>⚠ {error}</div>}
+          {error && (
+            <div style={{ ...g.alert("error"), marginBottom: 24 }}>
+              ⚠ {error}
+            </div>
+          )}
 
-          {/* Title */}
-          <div style={s.field}>
-            <label style={s.lbl}>Item Title</label>
+          <div style={g.field}>
+            <label style={g.label}>Item Title *</label>
             <input
-              style={s.inp}
+              style={inp}
               name="title"
               placeholder="e.g. Black Wallet, Blue Water Bottle"
               value={form.title}
-              onChange={handleChange}
+              onChange={set}
             />
           </div>
 
-          {/* Description */}
-          <div style={s.field}>
-            <label style={s.lbl}>Description</label>
+          <div style={g.field}>
+            <label style={g.label}>Description *</label>
             <textarea
-              style={s.ta}
+              style={{ ...g.textarea }}
               name="description"
-              placeholder="Describe the item — colour, brand, distinguishing features..."
+              placeholder="Colour, brand, distinguishing features…"
               value={form.description}
-              onChange={handleChange}
+              onChange={set}
             />
           </div>
 
-          {/* Category + Location row */}
-          <div style={s.row}>
-            <div style={s.field}>
-              <label style={s.lbl}>Category</label>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
+          >
+            <div style={g.field}>
+              <label style={g.label}>Category *</label>
               <select
-                style={s.inp}
+                style={inp}
                 name="category_id"
                 value={form.category_id}
-                onChange={handleChange}
+                onChange={set}
               >
-                <option value="">-- Select --</option>
-                {categories.map((c) => (
-                  <option key={c.category_id} value={c.category_id}>
-                    {c.cat_name}
+                <option value="">— Select —</option>
+                {categories.map((cat) => (
+                  <option key={cat.category_id} value={cat.category_id}>
+                    {cat.cat_name}
                   </option>
                 ))}
               </select>
             </div>
-            <div style={s.field}>
-              <label style={s.lbl}>Location Found</label>
+            <div style={g.field}>
+              <label style={g.label}>Location Found *</label>
               <select
-                style={s.inp}
+                style={inp}
                 name="location_found"
                 value={form.location_found}
-                onChange={handleChange}
+                onChange={set}
               >
-                <option value="">-- Select --</option>
-                {FAST_LOCATIONS.map((l) => (
+                <option value="">— Select —</option>
+                {LOCATIONS.map((l) => (
                   <option key={l} value={l}>
                     {l}
                   </option>
@@ -192,164 +203,46 @@ export default function RegisterItem({ user, onBack }) {
             </div>
           </div>
 
-          {/* Other location */}
           {form.location_found === "Other" && (
-            <div style={s.field}>
-              <label style={s.lbl}>Describe the Location</label>
+            <div style={g.field}>
+              <label style={g.label}>Specific Location *</label>
               <input
-                style={s.inp}
+                style={inp}
                 name="location_other"
-                placeholder="e.g. Near the main gate..."
+                placeholder="Describe the exact spot…"
                 value={form.location_other}
-                onChange={handleChange}
+                onChange={set}
               />
             </div>
           )}
 
-          {/* Date & Time */}
-          <div style={s.field}>
-            <label style={s.lbl}>Date &amp; Time Found</label>
+          <div style={g.field}>
+            <label style={g.label}>Date & Time Found *</label>
             <input
-              style={s.inp}
+              style={inp}
               type="datetime-local"
               name="found_at"
               value={form.found_at}
-              onChange={handleChange}
+              onChange={set}
             />
           </div>
 
-          <div style={s.divider} />
+          <div style={g.divider} />
+
           <button
-            style={{ ...s.btn, opacity: loading ? 0.7 : 1 }}
             onClick={handleSubmit}
             disabled={loading}
+            style={{
+              ...g.btnPrimary,
+              opacity: loading ? 0.6 : 1,
+              boxShadow: loading ? "none" : `0 0 24px rgba(0,229,176,0.2)`,
+              fontFamily: c.fh,
+            }}
           >
-            {loading ? "Registering..." : "Register Item"}
+            {loading ? "Registering…" : "Register Item →"}
           </button>
         </div>
       </div>
     </div>
   );
 }
-
-const s = {
-  page: { backgroundColor: "#eef2f9", minHeight: "100vh" },
-  nav: {
-    backgroundColor: "#0c2d6b",
-    padding: "10px 24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  navLeft: { display: "flex", alignItems: "center", gap: 10 },
-  nuCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: "50%",
-    backgroundColor: "#0c2d6b",
-    border: "2px solid #1a9e75",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nuText: { fontSize: 11, fontWeight: "500", color: "#fff" },
-  navDiv: { width: 1, height: 26, backgroundColor: "rgba(255,255,255,0.2)" },
-  brand: { color: "#fff", fontSize: 14, fontWeight: "500", letterSpacing: 1 },
-  navSub: { color: "rgba(255,255,255,0.45)", fontSize: 11, marginLeft: 2 },
-  backBtn: {
-    padding: "5px 14px",
-    borderRadius: 6,
-    fontSize: 11,
-    background: "rgba(255,255,255,0.1)",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-  },
-  body: { padding: 28, display: "flex", justifyContent: "center" },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    border: "0.5px solid #c8d8f0",
-    padding: "28px 28px",
-    width: "100%",
-    maxWidth: 520,
-  },
-  cardHead: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 4,
-  },
-  cardTitle: { fontSize: 17, fontWeight: "500", color: "#0c2d6b" },
-  staffBadge: {
-    fontSize: 11,
-    color: "#6b7a99",
-    backgroundColor: "#eef2f9",
-    padding: "4px 10px",
-    borderRadius: 20,
-  },
-  cardSub: { fontSize: 12, color: "#9aa5be", marginBottom: 20 },
-  successBox: {
-    backgroundColor: "#e6f4ea",
-    color: "#27500a",
-    padding: "10px 14px",
-    borderRadius: 8,
-    fontSize: 13,
-    marginBottom: 16,
-  },
-  errorBox: {
-    backgroundColor: "#fcebeb",
-    color: "#a32d2d",
-    padding: "10px 14px",
-    borderRadius: 8,
-    fontSize: 13,
-    marginBottom: 16,
-  },
-  field: { marginBottom: 14 },
-  lbl: {
-    display: "block",
-    fontSize: 11,
-    fontWeight: "500",
-    color: "#4a5878",
-    letterSpacing: "0.4px",
-    marginBottom: 5,
-    textTransform: "uppercase",
-  },
-  inp: {
-    width: "100%",
-    padding: "9px 12px",
-    borderRadius: 7,
-    border: "0.5px solid #c8d8f0",
-    fontSize: 13,
-    color: "#1a1a2e",
-    backgroundColor: "#f8faff",
-    outline: "none",
-    boxSizing: "border-box",
-  },
-  ta: {
-    width: "100%",
-    padding: "9px 12px",
-    borderRadius: 7,
-    border: "0.5px solid #c8d8f0",
-    fontSize: 13,
-    color: "#1a1a2e",
-    backgroundColor: "#f8faff",
-    outline: "none",
-    minHeight: 90,
-    resize: "vertical",
-    boxSizing: "border-box",
-  },
-  row: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 },
-  divider: { height: "0.5px", backgroundColor: "#eef2f9", margin: "18px 0" },
-  btn: {
-    width: "100%",
-    padding: 11,
-    backgroundColor: "#0c2d6b",
-    color: "#fff",
-    border: "none",
-    borderRadius: 8,
-    fontSize: 13,
-    fontWeight: "500",
-    cursor: "pointer",
-  },
-};

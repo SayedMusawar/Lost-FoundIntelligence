@@ -1,304 +1,313 @@
 import { useEffect, useState } from "react";
 import { getMyClaims } from "../api/client";
+import { c, g } from "../theme";
 
-export default function MyClaims({ user, onBack }) {
+const STATUS_STYLE = {
+  approved: {
+    bg: "rgba(0,214,143,0.12)",
+    color: "#00d68f",
+    border: "rgba(0,214,143,0.25)",
+    dot: "#00d68f",
+  },
+  rejected: {
+    bg: "rgba(255,77,77,0.12)",
+    color: "#ff6b6b",
+    border: "rgba(255,77,77,0.25)",
+    dot: "#ff6b6b",
+  },
+  pending: {
+    bg: "rgba(245,166,35,0.12)",
+    color: "#f5a623",
+    border: "rgba(245,166,35,0.25)",
+    dot: "#f5a623",
+  },
+};
+
+export default function MyClaims({ user }) {
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
-    getMyClaims(user.user_id).then((res) => {
-      setClaims(res.data);
+    getMyClaims(user.user_id).then((r) => {
+      setClaims(r.data);
       setLoading(false);
     });
   }, []);
 
-  const getStatusPillStyle = (status) => {
-    if (status === "approved") return { ...s.pill, ...s.pillApproved };
-    if (status === "rejected") return { ...s.pill, ...s.pillRejected };
-    return { ...s.pill, ...s.pillPending };
+  const counts = {
+    all: claims.length,
+    pending: claims.filter((cl) => cl.status === "pending").length,
+    approved: claims.filter((cl) => cl.status === "approved").length,
+    rejected: claims.filter((cl) => cl.status === "rejected").length,
   };
 
-  const pendingCount = claims.filter((c) => c.status === "pending").length;
-  const approvedCount = claims.filter((c) => c.status === "approved").length;
-  const rejectedCount = claims.filter((c) => c.status === "rejected").length;
+  const visible =
+    filter === "all" ? claims : claims.filter((cl) => cl.status === filter);
 
   return (
-    <div style={s.page}>
-      {/* ── Navbar ── */}
-      <nav style={s.nav}>
-        <div style={s.navLeft}>
-          <div style={s.nuCircle}>
-            <span style={s.nuText}>NU</span>
-          </div>
-          <div style={s.navDiv} />
-          <span style={s.brand}>I-FAST</span>
-          <span style={s.navSub}>Lost &amp; Found Portal</span>
-        </div>
-        <div style={s.navRight}>
-          <span style={s.userLabel}>
-            {user.name} ({user.role})
-          </span>
-          <button style={s.backBtn} onClick={onBack}>
-            ← Back to Items
-          </button>
-        </div>
-      </nav>
+    <div className="fade-up">
+      <div style={{ marginBottom: 28 }}>
+        <h1
+          style={{
+            fontFamily: c.fh,
+            fontSize: 26,
+            fontWeight: 700,
+            color: c.text,
+            marginBottom: 6,
+          }}
+        >
+          My Claims
+        </h1>
+        <p style={{ fontSize: 13, color: c.text2 }}>
+          Track all your submitted item claims
+        </p>
+      </div>
 
-      {/* ── Body ── */}
-      <div style={s.body}>
-        {/* Page header */}
-        <div style={s.pageHead}>
-          <div>
-            <h2 style={s.pageTitle}>My Claims</h2>
-            <p style={s.pageSub}>Track all your submitted item claims</p>
-          </div>
-          <span style={s.adminBadge}>{user.name}</span>
-        </div>
-
-        {/* Stats */}
-        {!loading && claims.length > 0 && (
-          <div style={s.statsRow}>
-            {[
-              { val: claims.length, lbl: "Total claims" },
-              { val: pendingCount, lbl: "Pending", warn: pendingCount > 0 },
-              { val: approvedCount, lbl: "Approved" },
-              { val: rejectedCount, lbl: "Rejected" },
-            ].map(({ val, lbl, warn }) => (
-              <div key={lbl} style={s.statCard}>
-                <div style={{ ...s.statVal, ...(warn ? s.statWarn : {}) }}>
-                  {val}
-                </div>
-                <div style={s.statLbl}>{lbl}</div>
+      {/* Stats */}
+      {!loading && (
+        <div style={g.statsRow}>
+          {[
+            { key: "all", val: counts.all, lbl: "Total", accent: c.text2 },
+            {
+              key: "pending",
+              val: counts.pending,
+              lbl: "Pending",
+              accent: c.amber,
+            },
+            {
+              key: "approved",
+              val: counts.approved,
+              lbl: "Approved",
+              accent: c.green,
+            },
+            {
+              key: "rejected",
+              val: counts.rejected,
+              lbl: "Rejected",
+              accent: c.red,
+            },
+          ].map(({ key, val, lbl, accent }) => (
+            <div
+              key={key}
+              onClick={() => setFilter(key)}
+              style={{
+                ...g.statCard(filter === key ? accent : c.border),
+                cursor: "pointer",
+                transition: "all 0.15s",
+                background:
+                  filter === key
+                    ? `rgba(${accent === c.amber ? "245,166,35" : accent === c.green ? "0,214,143" : accent === c.red ? "255,77,77" : "125,138,170"},0.08)`
+                    : c.surface,
+              }}
+            >
+              <div
+                style={{
+                  ...g.statVal,
+                  color: filter === key ? accent : c.text,
+                }}
+              >
+                {val}
               </div>
-            ))}
+              <div style={g.statLbl}>{lbl}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {loading && (
+        <div style={g.empty}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              border: `3px solid ${c.teal}`,
+              borderTopColor: "transparent",
+              borderRadius: "50%",
+              animation: "spin 0.8s linear infinite",
+              margin: "0 auto 16px",
+            }}
+          />
+        </div>
+      )}
+
+      {!loading && claims.length === 0 && (
+        <div style={g.empty}>
+          <span style={g.emptyIcon}>📭</span>
+          <p style={g.emptyTitle}>No claims yet</p>
+          <p style={g.emptySub}>
+            Browse items and click "Claim This Item" to get started.
+          </p>
+        </div>
+      )}
+
+      {!loading && visible.length > 0 && (
+        <>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: c.text3,
+              letterSpacing: "1.2px",
+              textTransform: "uppercase",
+              marginBottom: 16,
+            }}
+          >
+            {filter === "all" ? "All Claims" : `${filter} Claims`} (
+            {visible.length})
           </div>
-        )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {visible.map((claim, i) => {
+              const sc = STATUS_STYLE[claim.status] || STATUS_STYLE.pending;
+              return (
+                <div
+                  key={claim.claim_id}
+                  className="fade-up"
+                  style={{
+                    ...g.card,
+                    borderRadius: 14,
+                    borderLeft: `3px solid ${sc.dot}`,
+                    animationDelay: `${i * 0.04}s`,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      marginBottom: 14,
+                      flexWrap: "wrap",
+                      gap: 10,
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: c.text3,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.8px",
+                          marginBottom: 6,
+                        }}
+                      >
+                        Item
+                      </div>
+                      <h3
+                        style={{
+                          fontFamily: c.fh,
+                          fontSize: 16,
+                          fontWeight: 700,
+                          color: c.text,
+                          marginBottom: 4,
+                        }}
+                      >
+                        {claim.title}
+                      </h3>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: c.text3,
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 2,
+                        }}
+                      >
+                        <span>📍 {claim.location_found}</span>
+                        <span>
+                          🕐 Submitted:{" "}
+                          {new Date(claim.submitted_at).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "6px 14px",
+                        borderRadius: 99,
+                        background: sc.bg,
+                        color: sc.color,
+                        border: `1px solid ${sc.border}`,
+                        fontSize: 11,
+                        fontWeight: 700,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          background: sc.dot,
+                        }}
+                      />
+                      {claim.status.charAt(0).toUpperCase() +
+                        claim.status.slice(1)}
+                    </span>
+                  </div>
 
-        {/* Section label */}
-        {!loading && claims.length > 0 && (
-          <p style={s.sectionLbl}>All claims</p>
-        )}
+                  <div style={g.divider} />
 
-        {/* Loading */}
-        {loading && <p style={s.empty}>Loading...</p>}
-
-        {/* Empty state */}
-        {!loading && claims.length === 0 && (
-          <div style={s.emptyBox}>
-            <div style={s.emptyIcon}>📭</div>
-            <p style={s.emptyTitle}>No claims yet</p>
-            <p style={s.emptySub}>
-              Browse items and click "Claim This" to submit one.
-            </p>
-          </div>
-        )}
-
-        {/* Claims list */}
-        {!loading && claims.length > 0 && (
-          <div style={s.list}>
-            {claims.map((claim) => (
-              <div key={claim.claim_id} style={s.card}>
-                <div style={s.cardTop}>
-                  <div>
-                    <p style={s.cardItemTag}>Item</p>
-                    <h3 style={s.cardItemName}>{claim.title}</h3>
-                    <p style={s.cardMeta}>📍 {claim.location_found}</p>
-                    <p style={s.cardMeta}>
-                      🕐 Submitted:{" "}
-                      {new Date(claim.submitted_at).toLocaleString()}
+                  <div
+                    style={{
+                      background: c.bg3,
+                      borderRadius: 8,
+                      border: `1px solid ${c.border}`,
+                      padding: "12px 16px",
+                      marginBottom: claim.status !== "pending" ? 14 : 0,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10,
+                        color: c.text3,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.8px",
+                        marginBottom: 6,
+                      }}
+                    >
+                      Your Proof
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 13,
+                        color: c.text2,
+                        lineHeight: 1.65,
+                        fontStyle: "italic",
+                      }}
+                    >
+                      "{claim.claim_description}"
                     </p>
                   </div>
-                  <span style={getStatusPillStyle(claim.status)}>
-                    {claim.status.charAt(0).toUpperCase() +
-                      claim.status.slice(1)}
-                  </span>
+
+                  {claim.status === "approved" && (
+                    <div
+                      style={{
+                        ...g.alert("success"),
+                        marginTop: 14,
+                        marginBottom: 0,
+                      }}
+                    >
+                      ✓ Approved — visit Student Affairs to collect your item.
+                    </div>
+                  )}
+                  {claim.status === "rejected" && (
+                    <div
+                      style={{
+                        ...g.alert("error"),
+                        marginTop: 14,
+                        marginBottom: 0,
+                      }}
+                    >
+                      ✕ Not approved. Contact Student Affairs for details.
+                    </div>
+                  )}
                 </div>
-
-                <div style={s.divider} />
-
-                <div style={s.proofBox}>
-                  <p style={s.proofLabel}>Your ownership proof</p>
-                  <p style={s.proofText}>"{claim.claim_description}"</p>
-                </div>
-
-                {claim.status === "approved" && (
-                  <div style={s.noteApproved}>
-                    Your claim was approved — visit Student Affairs to collect
-                    your item.
-                  </div>
-                )}
-                {claim.status === "rejected" && (
-                  <div style={s.noteRejected}>
-                    Your claim was not approved. Contact Student Affairs for
-                    more information.
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 }
-
-const s = {
-  page: { backgroundColor: "#eef2f9", minHeight: "100vh" },
-  nav: {
-    backgroundColor: "#0c2d6b",
-    padding: "10px 24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  navLeft: { display: "flex", alignItems: "center", gap: 10 },
-  nuCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: "50%",
-    backgroundColor: "#0c2d6b",
-    border: "2px solid #1a9e75",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nuText: { fontSize: 11, fontWeight: "500", color: "#fff" },
-  navDiv: { width: 1, height: 26, backgroundColor: "rgba(255,255,255,0.2)" },
-  brand: { color: "#fff", fontSize: 14, fontWeight: "500", letterSpacing: 1 },
-  navSub: { color: "rgba(255,255,255,0.45)", fontSize: 11, marginLeft: 2 },
-  navRight: { display: "flex", alignItems: "center", gap: 10 },
-  userLabel: { color: "rgba(255,255,255,0.6)", fontSize: 11 },
-  backBtn: {
-    padding: "5px 14px",
-    borderRadius: 6,
-    fontSize: 11,
-    background: "rgba(255,255,255,0.1)",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-  },
-  body: { padding: 24 },
-  pageHead: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-  pageTitle: { fontSize: 18, fontWeight: "500", color: "#0c2d6b", margin: 0 },
-  pageSub: { fontSize: 12, color: "#9aa5be", marginTop: 2, marginBottom: 0 },
-  adminBadge: {
-    backgroundColor: "#e6edf9",
-    color: "#0c2d6b",
-    padding: "6px 14px",
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  statsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4,1fr)",
-    gap: 10,
-    marginBottom: 20,
-  },
-  statCard: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    border: "0.5px solid #c8d8f0",
-    padding: "12px 14px",
-  },
-  statVal: { fontSize: 22, fontWeight: "500", color: "#0c2d6b" },
-  statWarn: { color: "#854f0b" },
-  statLbl: { fontSize: 11, color: "#6b7a99", marginTop: 2 },
-  sectionLbl: {
-    fontSize: 11,
-    fontWeight: "500",
-    color: "#4a5878",
-    letterSpacing: "0.5px",
-    textTransform: "uppercase",
-    marginBottom: 12,
-  },
-  empty: { color: "#9aa5be", textAlign: "center", marginTop: 60 },
-  emptyBox: { textAlign: "center", marginTop: 80 },
-  emptyIcon: { fontSize: 36, marginBottom: 10 },
-  emptyTitle: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#0c2d6b",
-    marginBottom: 4,
-  },
-  emptySub: { fontSize: 13, color: "#9aa5be" },
-  list: { display: "flex", flexDirection: "column", gap: 12 },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    border: "0.5px solid #c8d8f0",
-    padding: "18px 20px",
-  },
-  cardTop: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 12,
-  },
-  cardItemTag: {
-    fontSize: 10,
-    color: "#6b7a99",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    marginBottom: 4,
-  },
-  cardItemName: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#1a1a2e",
-    marginBottom: 4,
-  },
-  cardMeta: { fontSize: 11, color: "#9aa5be", marginBottom: 2 },
-  pill: {
-    padding: "3px 12px",
-    borderRadius: 20,
-    fontSize: 11,
-    fontWeight: "500",
-    whiteSpace: "nowrap",
-  },
-  pillPending: { backgroundColor: "#faeeda", color: "#633806" },
-  pillApproved: { backgroundColor: "#e6f4ea", color: "#27500a" },
-  pillRejected: { backgroundColor: "#fcebeb", color: "#a32d2d" },
-  divider: { height: "0.5px", backgroundColor: "#eef2f9", margin: "12px 0" },
-  proofBox: {
-    backgroundColor: "#f8faff",
-    borderRadius: 7,
-    padding: 12,
-    marginBottom: 12,
-    border: "0.5px solid #e0e8f4",
-  },
-  proofLabel: {
-    fontSize: 10,
-    color: "#6b7a99",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    marginBottom: 6,
-    fontWeight: "500",
-  },
-  proofText: {
-    fontSize: 12,
-    color: "#4a5878",
-    lineHeight: 1.6,
-    fontStyle: "italic",
-    margin: 0,
-  },
-  noteApproved: {
-    backgroundColor: "#e6f4ea",
-    color: "#27500a",
-    padding: "10px 14px",
-    borderRadius: 7,
-    fontSize: 12,
-  },
-  noteRejected: {
-    backgroundColor: "#fcebeb",
-    color: "#a32d2d",
-    padding: "10px 14px",
-    borderRadius: 7,
-    fontSize: 12,
-  },
-};

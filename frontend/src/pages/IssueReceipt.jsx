@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getApprovedNoReceipt, createReceipt, getReceipt } from "../api/client";
+import { c, tr, g } from "../theme";
 
 export default function IssueReceipt({ user, onBack }) {
   const [approved, setApproved] = useState([]);
@@ -32,7 +33,7 @@ export default function IssueReceipt({ user, onBack }) {
 
   const handleIssue = async () => {
     if (!form.receiver_name || !form.receiver_phone) {
-      setError("Receiver name and phone are required");
+      setError("Receiver name and phone are required.");
       return;
     }
     setLoading(true);
@@ -45,293 +46,570 @@ export default function IssueReceipt({ user, onBack }) {
       const res = await getReceipt(selected.claim_id);
       setReceipt(res.data);
       setError("");
-      setApproved((prev) =>
-        prev.filter((c) => c.claim_id !== selected.claim_id),
-      );
+      setApproved((p) => p.filter((cl) => cl.claim_id !== selected.claim_id));
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to issue receipt");
+      setError(err.response?.data?.detail || "Failed to issue receipt.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ── Printed receipt view ──
+  const inp = {
+    width: "100%",
+    padding: "11px 14px",
+    background: c.bg3,
+    border: `1px solid ${c.border}`,
+    borderRadius: 8,
+    fontSize: 13,
+    color: c.text,
+    transition: tr,
+    boxSizing: "border-box",
+  };
+
+  // Receipt printed view
   if (receipt)
     return (
-      <div style={s.page}>
-        <nav style={s.nav}>
-          <div style={s.navLeft}>
-            <div style={s.nuCircle}>
-              <span style={s.nuText}>NU</span>
-            </div>
-            <div style={s.navDiv} />
-            <span style={s.brand}>I-FAST</span>
-            <span style={s.navSub}>Lost &amp; Found Portal</span>
-          </div>
-          <button style={s.backBtn} onClick={onBack}>
+      <div className="fade-up">
+        <div style={{ marginBottom: 24 }}>
+          <button
+            onClick={onBack}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: c.text2,
+              fontSize: 13,
+              cursor: "pointer",
+              padding: "0 0 16px",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
             ← Back to Dashboard
           </button>
-        </nav>
-        <div style={s.body}>
-          <div style={s.receiptWrap}>
-            <div style={s.receiptCard}>
-              <div style={s.receiptHeader}>
-                <p style={s.receiptLogo}>FAST-NUCES Peshawar</p>
-                <p style={s.receiptHeaderSub}>
-                  Lost &amp; Found — Item Handover Receipt
-                </p>
-                <span style={s.receiptId}>Receipt #{receipt.receipt_id}</span>
+          <h1
+            style={{
+              fontFamily: c.fh,
+              fontSize: 26,
+              fontWeight: 700,
+              color: c.text,
+              marginBottom: 6,
+            }}
+          >
+            Receipt Issued
+          </h1>
+          <p style={{ fontSize: 13, color: c.green }}>
+            ✓ Item handover confirmed
+          </p>
+        </div>
+        <div style={{ maxWidth: 520 }}>
+          <div
+            style={{
+              ...g.card,
+              borderRadius: 16,
+              border: `1px solid rgba(0,229,176,0.2)`,
+              background: "rgba(0,229,176,0.04)",
+            }}
+          >
+            {/* Receipt header */}
+            <div
+              style={{
+                textAlign: "center",
+                paddingBottom: 20,
+                borderBottom: `1px solid ${c.border}`,
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: c.fh,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: c.text,
+                  marginBottom: 4,
+                }}
+              >
+                FAST-NUCES Peshawar
               </div>
-              {[
-                {
-                  label: "Item details",
-                  rows: [
-                    ["Item", receipt.title],
-                    ["Description", receipt.description],
-                    ["Found at", receipt.location_found],
+              <div style={{ fontSize: 11, color: c.text3, marginBottom: 10 }}>
+                Lost & Found — Item Handover Receipt
+              </div>
+              <span
+                style={{
+                  padding: "3px 12px",
+                  borderRadius: 99,
+                  background: "rgba(0,229,176,0.12)",
+                  color: c.teal,
+                  fontSize: 10,
+                  fontWeight: 600,
+                }}
+              >
+                Receipt #{receipt.receipt_id}
+              </span>
+            </div>
+
+            {[
+              {
+                label: "Item Details",
+                rows: [
+                  ["Item", receipt.title],
+                  ["Description", receipt.description],
+                  ["Found at", receipt.location_found],
+                ],
+              },
+              {
+                label: "Receiver",
+                rows: [
+                  ["Name", receipt.receiver_name],
+                  ["Phone", receipt.receiver_phone],
+                  ["Roll No", receipt.roll_number || "—"],
+                  ["Email", receipt.claimant_email],
+                ],
+              },
+              {
+                label: "Handover",
+                rows: [
+                  [
+                    "Condition",
+                    receipt.condition_at_handover || "Not specified",
                   ],
-                },
-                {
-                  label: "Receiver details",
-                  rows: [
-                    ["Name", receipt.receiver_name],
-                    ["Phone", receipt.receiver_phone],
-                    ["Roll No", receipt.roll_number || "—"],
-                    ["Email", receipt.claimant_email],
-                  ],
-                },
-                {
-                  label: "Handover details",
-                  rows: [
-                    [
-                      "Condition",
-                      receipt.condition_at_handover || "Not specified",
-                    ],
-                    ["Notes", receipt.notes || "—"],
-                    ["Issued by", receipt.issued_by_name],
-                    [
-                      "Date & time",
-                      new Date(receipt.issued_at).toLocaleString(),
-                    ],
-                  ],
-                },
-              ].map(({ label, rows }) => (
-                <div key={label} style={s.rSection}>
-                  <p style={s.rSectionLbl}>{label}</p>
-                  {rows.map(([k, v]) => (
-                    <div key={k} style={s.rRow}>
-                      <span style={s.rKey}>{k}</span>
-                      <span style={s.rVal}>{v}</span>
-                    </div>
-                  ))}
+                  ["Notes", receipt.notes || "—"],
+                  ["Issued by", receipt.issued_by_name],
+                  ["Date", new Date(receipt.issued_at).toLocaleString()],
+                ],
+              },
+            ].map(({ label, rows }) => (
+              <div key={label} style={{ marginBottom: 18 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: c.text3,
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    marginBottom: 8,
+                  }}
+                >
+                  {label}
                 </div>
-              ))}
-              <div style={s.receiptFooter}>
-                This receipt confirms the item was collected by the above
-                person.
-                <br />
-                FAST-NUCES Peshawar — Student Affairs Office
+                {rows.map(([k, v]) => (
+                  <div
+                    key={k}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "6px 0",
+                      borderBottom: `1px solid ${c.border}`,
+                      fontSize: 13,
+                    }}
+                  >
+                    <span style={{ color: c.text2 }}>{k}</span>
+                    <span
+                      style={{
+                        color: c.text,
+                        fontWeight: 500,
+                        textAlign: "right",
+                        maxWidth: 260,
+                      }}
+                    >
+                      {v}
+                    </span>
+                  </div>
+                ))}
               </div>
+            ))}
+
+            <div
+              style={{
+                textAlign: "center",
+                fontSize: 11,
+                color: c.text3,
+                lineHeight: 1.7,
+                paddingTop: 16,
+                borderTop: `1px solid ${c.border}`,
+              }}
+            >
+              This receipt confirms the item was collected by the above person.
+              <br />
+              FAST-NUCES Peshawar — Student Affairs Office
             </div>
-            <div style={s.printActions}>
-              <button style={s.printBtn} onClick={() => window.print()}>
-                Print Receipt
-              </button>
-              <button style={s.backLinkBtn} onClick={onBack}>
-                ← Back to Dashboard
-              </button>
-            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+            <button
+              onClick={() => window.print()}
+              style={{
+                flex: 2,
+                padding: "12px",
+                background: c.teal,
+                color: c.bg,
+                border: "none",
+                borderRadius: 8,
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: c.fh,
+              }}
+            >
+              🖨 Print Receipt
+            </button>
+            <button
+              onClick={onBack}
+              style={{
+                flex: 1,
+                padding: "12px",
+                background: c.surface,
+                border: `1px solid ${c.border}`,
+                borderRadius: 8,
+                fontSize: 13,
+                color: c.text2,
+                cursor: "pointer",
+              }}
+            >
+              ← Back
+            </button>
           </div>
         </div>
       </div>
     );
 
-  // ── Main view ──
   return (
-    <div style={s.page}>
-      <nav style={s.nav}>
-        <div style={s.navLeft}>
-          <div style={s.nuCircle}>
-            <span style={s.nuText}>NU</span>
-          </div>
-          <div style={s.navDiv} />
-          <span style={s.brand}>I-FAST</span>
-          <span style={s.navSub}>Lost &amp; Found Portal</span>
-        </div>
-        <button style={s.backBtn} onClick={onBack}>
+    <div className="fade-up">
+      <div style={{ marginBottom: 28 }}>
+        <button
+          onClick={onBack}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: c.text2,
+            fontSize: 13,
+            cursor: "pointer",
+            padding: "0 0 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
           ← Back to Dashboard
         </button>
-      </nav>
+        <h1
+          style={{
+            fontFamily: c.fh,
+            fontSize: 26,
+            fontWeight: 700,
+            color: c.text,
+            marginBottom: 6,
+          }}
+        >
+          Issue Receipt
+        </h1>
+        <p style={{ fontSize: 13, color: c.text2 }}>
+          Issue handover receipts for approved claims
+        </p>
+      </div>
 
-      <div style={{ ...s.body, alignItems: "flex-start", gap: 20 }}>
-        {/* ── Left: claim list + form ── */}
-        <div style={s.left}>
-          <p style={s.sectionLbl}>Approved claims — awaiting receipt</p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 380px",
+          gap: 20,
+          alignItems: "start",
+        }}
+      >
+        {/* Left: claim list + form */}
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: c.text3,
+              letterSpacing: "1.2px",
+              textTransform: "uppercase",
+              marginBottom: 14,
+            }}
+          >
+            Awaiting Receipt ({approved.length})
+          </div>
 
-          {approved.length === 0 && !selected && (
-            <div style={s.emptyBox}>
-              <div style={s.emptyIcon}>✓</div>
-              <p style={s.emptyTitle}>No pending receipts</p>
-              <p style={s.emptySub}>
-                All approved claims have been issued receipts.
-              </p>
+          {approved.length === 0 && (
+            <div style={g.empty}>
+              <span style={g.emptyIcon}>✅</span>
+              <p style={g.emptyTitle}>All receipts issued</p>
+              <p style={g.emptySub}>No approved claims pending receipt.</p>
             </div>
           )}
 
-          <div style={s.claimList}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              marginBottom: 20,
+            }}
+          >
             {approved.map((claim) => (
               <div
                 key={claim.claim_id}
                 style={{
-                  ...s.claimRow,
-                  ...(selected?.claim_id === claim.claim_id
-                    ? s.claimRowActive
-                    : {}),
+                  ...g.card,
+                  padding: "14px 18px",
+                  borderRadius: 10,
+                  border:
+                    selected?.claim_id === claim.claim_id
+                      ? `1px solid rgba(0,229,176,0.3)`
+                      : `1px solid ${c.border}`,
+                  background:
+                    selected?.claim_id === claim.claim_id
+                      ? "rgba(0,229,176,0.05)"
+                      : c.surface,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
                 }}
               >
                 <div>
-                  <p style={s.crTitle}>{claim.title}</p>
-                  <p style={s.crMeta}>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: c.text,
+                      marginBottom: 3,
+                      fontFamily: c.fh,
+                    }}
+                  >
+                    {claim.title}
+                  </div>
+                  <div style={{ fontSize: 11, color: c.text3 }}>
                     {claim.claimant_name} · {claim.roll_number || "—"} · 📍{" "}
                     {claim.location_found}
-                  </p>
+                  </div>
                 </div>
-                <button style={s.issueBtn} onClick={() => handleSelect(claim)}>
-                  Issue Receipt →
+                <button
+                  onClick={() => handleSelect(claim)}
+                  style={{
+                    padding: "7px 14px",
+                    background: "rgba(0,229,176,0.10)",
+                    border: `1px solid rgba(0,229,176,0.2)`,
+                    borderRadius: 7,
+                    color: c.teal,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Issue →
                 </button>
               </div>
             ))}
           </div>
 
           {selected && (
-            <div style={s.formCard}>
-              <p style={s.formTitle}>
-                Issuing receipt for: <strong>{selected.title}</strong>
-              </p>
-              <p style={s.formSub}>Claimant: {selected.claimant_name}</p>
+            <div style={{ ...g.card, borderRadius: 14 }}>
+              <div style={{ marginBottom: 18 }}>
+                <div
+                  style={{
+                    fontSize: 10,
+                    color: c.text3,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.8px",
+                    marginBottom: 6,
+                  }}
+                >
+                  Issuing for
+                </div>
+                <div
+                  style={{
+                    fontFamily: c.fh,
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: c.text,
+                  }}
+                >
+                  {selected.title}
+                </div>
+                <div style={{ fontSize: 12, color: c.text2 }}>
+                  {selected.claimant_name}
+                </div>
+              </div>
 
               {[
                 { lbl: "Receiver Name", key: "receiver_name", ph: "Full name" },
                 {
-                  lbl: "Receiver Phone",
+                  lbl: "Phone Number",
                   key: "receiver_phone",
                   ph: "03XX-XXXXXXX",
                 },
                 {
-                  lbl: "Item condition at handover",
+                  lbl: "Item Condition",
                   key: "condition_at_handover",
-                  ph: "e.g. Good condition, minor scratches",
+                  ph: "e.g. Good, minor scratches",
                 },
               ].map(({ lbl, key, ph }) => (
-                <div key={key} style={s.field}>
-                  <label style={s.lbl}>{lbl}</label>
+                <div key={key} style={g.field}>
+                  <label style={g.label}>{lbl}</label>
                   <input
-                    style={s.inp}
+                    style={inp}
                     placeholder={ph}
                     value={form[key]}
                     onChange={(e) =>
-                      setForm({ ...form, [key]: e.target.value })
+                      setForm((f) => ({ ...f, [key]: e.target.value }))
                     }
                   />
                 </div>
               ))}
 
-              <div style={s.field}>
-                <label style={s.lbl}>Notes (optional)</label>
+              <div style={g.field}>
+                <label style={g.label}>Notes (optional)</label>
                 <textarea
-                  style={s.ta}
-                  placeholder="Any additional notes..."
+                  style={{ ...g.textarea, minHeight: 70 }}
+                  placeholder="Additional notes…"
                   value={form.notes}
-                  onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, notes: e.target.value }))
+                  }
                 />
               </div>
 
-              {error && <div style={s.errorBox}>⚠ {error}</div>}
-              <div style={s.divider} />
-              <div style={s.btnRow}>
-                <button style={s.btnCancel} onClick={() => setSelected(null)}>
+              {error && <div style={g.alert("error")}>⚠ {error}</div>}
+              <div style={g.divider} />
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => setSelected(null)}
+                  style={{
+                    flex: 1,
+                    padding: "11px",
+                    background: "transparent",
+                    border: `1px solid ${c.border}`,
+                    borderRadius: 8,
+                    fontSize: 13,
+                    color: c.text2,
+                    cursor: "pointer",
+                  }}
+                >
                   Cancel
                 </button>
                 <button
-                  style={{ ...s.btnIssue, opacity: loading ? 0.7 : 1 }}
                   onClick={handleIssue}
                   disabled={loading}
+                  style={{
+                    flex: 2,
+                    padding: "11px",
+                    background: c.teal,
+                    color: c.bg,
+                    border: "none",
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: c.fh,
+                    opacity: loading ? 0.6 : 1,
+                  }}
                 >
-                  {loading ? "Issuing..." : "✓ Issue Receipt"}
+                  {loading ? "Issuing…" : "✓ Issue Receipt"}
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* ── Right: receipt preview (static placeholder when no receipt yet) ── */}
-        <div style={s.right}>
-          <p style={s.sectionLbl}>Receipt preview</p>
-          <div style={s.receiptCard}>
-            <div style={s.receiptHeader}>
-              <p style={s.receiptLogo}>FAST-NUCES Peshawar</p>
-              <p style={s.receiptHeaderSub}>
-                Lost &amp; Found — Item Handover Receipt
-              </p>
-              <span style={s.receiptId}>
-                {selected
-                  ? `For: ${selected.title}`
-                  : "Select a claim to preview"}
+        {/* Right: live preview */}
+        <div>
+          <div
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: c.text3,
+              letterSpacing: "1.2px",
+              textTransform: "uppercase",
+              marginBottom: 14,
+            }}
+          >
+            Receipt Preview
+          </div>
+          <div
+            style={{ ...g.card, borderRadius: 14, opacity: selected ? 1 : 0.4 }}
+          >
+            <div
+              style={{
+                textAlign: "center",
+                paddingBottom: 16,
+                borderBottom: `1px solid ${c.border}`,
+                marginBottom: 16,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: c.fh,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: c.text,
+                  marginBottom: 3,
+                }}
+              >
+                FAST-NUCES Peshawar
+              </div>
+              <div style={{ fontSize: 10, color: c.text3, marginBottom: 8 }}>
+                Item Handover Receipt
+              </div>
+              <span
+                style={{
+                  padding: "2px 10px",
+                  borderRadius: 99,
+                  background: c.bg3,
+                  color: c.text3,
+                  fontSize: 9,
+                }}
+              >
+                {selected ? `Claim #${selected.claim_id}` : "Select a claim"}
               </span>
             </div>
             {selected ? (
               <>
                 {[
-                  {
-                    label: "Item details",
-                    rows: [
-                      ["Item", selected.title],
-                      ["Found at", selected.location_found],
-                    ],
-                  },
-                  {
-                    label: "Receiver details",
-                    rows: [
-                      ["Name", form.receiver_name || "—"],
-                      ["Roll No", selected.roll_number || "—"],
-                      ["Email", selected.claimant_email],
-                    ],
-                  },
-                  {
-                    label: "Handover details",
-                    rows: [
-                      ["Condition", form.condition_at_handover || "—"],
-                      ["Issued by", user.name],
-                      ["Date & time", new Date().toLocaleString()],
-                    ],
-                  },
-                ].map(({ label, rows }) => (
-                  <div key={label} style={s.rSection}>
-                    <p style={s.rSectionLbl}>{label}</p>
-                    {rows.map(([k, v]) => (
-                      <div key={k} style={s.rRow}>
-                        <span style={s.rKey}>{k}</span>
-                        <span style={s.rVal}>{v}</span>
-                      </div>
-                    ))}
+                  ["Item", selected.title],
+                  ["Claimant", form.receiver_name || selected.claimant_name],
+                  ["Phone", form.receiver_phone || "—"],
+                  ["Location", selected.location_found],
+                  ["Condition", form.condition_at_handover || "—"],
+                ].map(([k, v]) => (
+                  <div
+                    key={k}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "5px 0",
+                      borderBottom: `1px solid ${c.border}`,
+                      fontSize: 12,
+                    }}
+                  >
+                    <span style={{ color: c.text2 }}>{k}</span>
+                    <span style={{ color: c.text, fontWeight: 500 }}>{v}</span>
                   </div>
                 ))}
               </>
             ) : (
               <p
                 style={{
-                  fontSize: 12,
-                  color: "#9aa5be",
                   textAlign: "center",
+                  fontSize: 12,
+                  color: c.text3,
                   padding: "20px 0",
                 }}
               >
-                Select a claim from the list to see a preview here.
+                Select a claim to preview
               </p>
             )}
-            <div style={s.receiptFooter}>
-              This receipt confirms the item was collected by the above person.
-              <br />
+            <div
+              style={{
+                textAlign: "center",
+                fontSize: 10,
+                color: c.text3,
+                paddingTop: 12,
+                borderTop: `1px solid ${c.border}`,
+                marginTop: 14,
+                lineHeight: 1.6,
+              }}
+            >
               FAST-NUCES Peshawar — Student Affairs Office
             </div>
           </div>
@@ -340,250 +618,3 @@ export default function IssueReceipt({ user, onBack }) {
     </div>
   );
 }
-
-const s = {
-  page: { backgroundColor: "#eef2f9", minHeight: "100vh" },
-  nav: {
-    backgroundColor: "#0c2d6b",
-    padding: "10px 24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  navLeft: { display: "flex", alignItems: "center", gap: 10 },
-  nuCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: "50%",
-    backgroundColor: "#0c2d6b",
-    border: "2px solid #1a9e75",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nuText: { fontSize: 11, fontWeight: "500", color: "#fff" },
-  navDiv: { width: 1, height: 26, backgroundColor: "rgba(255,255,255,0.2)" },
-  brand: { color: "#fff", fontSize: 14, fontWeight: "500", letterSpacing: 1 },
-  navSub: { color: "rgba(255,255,255,0.45)", fontSize: 11, marginLeft: 2 },
-  backBtn: {
-    padding: "5px 14px",
-    borderRadius: 6,
-    fontSize: 11,
-    background: "rgba(255,255,255,0.1)",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-  },
-  body: { padding: 24, display: "flex", gap: 20, alignItems: "flex-start" },
-  left: { flex: 1, minWidth: 0 },
-  right: { width: 300, flexShrink: 0 },
-  sectionLbl: {
-    fontSize: 11,
-    fontWeight: "500",
-    color: "#4a5878",
-    letterSpacing: "0.5px",
-    textTransform: "uppercase",
-    marginBottom: 10,
-  },
-  claimList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    marginBottom: 16,
-  },
-  claimRow: {
-    backgroundColor: "#fff",
-    borderRadius: 9,
-    border: "0.5px solid #c8d8f0",
-    padding: "14px 16px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  claimRowActive: { borderColor: "#0c2d6b", backgroundColor: "#f0f4ff" },
-  crTitle: {
-    fontSize: 13,
-    fontWeight: "500",
-    color: "#1a1a2e",
-    marginBottom: 3,
-  },
-  crMeta: { fontSize: 11, color: "#6b7a99" },
-  issueBtn: {
-    padding: "6px 14px",
-    backgroundColor: "#0c2d6b",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
-    fontSize: 11,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-  },
-  formCard: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    border: "0.5px solid #c8d8f0",
-    padding: 18,
-  },
-  formTitle: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#0c2d6b",
-    marginBottom: 2,
-  },
-  formSub: { fontSize: 11, color: "#9aa5be", marginBottom: 14 },
-  field: { marginBottom: 12 },
-  lbl: {
-    display: "block",
-    fontSize: 11,
-    fontWeight: "500",
-    color: "#4a5878",
-    letterSpacing: "0.4px",
-    marginBottom: 4,
-    textTransform: "uppercase",
-  },
-  inp: {
-    width: "100%",
-    padding: "8px 11px",
-    borderRadius: 7,
-    border: "0.5px solid #c8d8f0",
-    fontSize: 13,
-    color: "#1a1a2e",
-    backgroundColor: "#f8faff",
-    outline: "none",
-    boxSizing: "border-box",
-  },
-  ta: {
-    width: "100%",
-    padding: "8px 11px",
-    borderRadius: 7,
-    border: "0.5px solid #c8d8f0",
-    fontSize: 13,
-    color: "#1a1a2e",
-    backgroundColor: "#f8faff",
-    outline: "none",
-    minHeight: 70,
-    resize: "vertical",
-    boxSizing: "border-box",
-  },
-  errorBox: {
-    backgroundColor: "#fcebeb",
-    color: "#a32d2d",
-    padding: "10px 14px",
-    borderRadius: 8,
-    fontSize: 13,
-    marginBottom: 10,
-  },
-  divider: { height: "0.5px", backgroundColor: "#eef2f9", margin: "14px 0" },
-  btnRow: { display: "flex", gap: 8 },
-  btnCancel: {
-    flex: 1,
-    padding: 9,
-    backgroundColor: "#fff",
-    color: "#4a5878",
-    border: "0.5px solid #c8d8f0",
-    borderRadius: 7,
-    fontSize: 12,
-    cursor: "pointer",
-  },
-  btnIssue: {
-    flex: 2,
-    padding: 9,
-    backgroundColor: "#0c2d6b",
-    color: "#fff",
-    border: "none",
-    borderRadius: 7,
-    fontSize: 12,
-    fontWeight: "500",
-    cursor: "pointer",
-  },
-  emptyBox: { textAlign: "center", marginTop: 60, marginBottom: 20 },
-  emptyIcon: { fontSize: 32, color: "#1a9e75", marginBottom: 8 },
-  emptyTitle: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#0c2d6b",
-    marginBottom: 4,
-  },
-  emptySub: { fontSize: 12, color: "#9aa5be" },
-  receiptWrap: { maxWidth: 560, margin: "0 auto" },
-  receiptCard: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    border: "0.5px solid #c8d8f0",
-    padding: 24,
-  },
-  receiptHeader: {
-    textAlign: "center",
-    borderBottom: "0.5px solid #eef2f9",
-    paddingBottom: 16,
-    marginBottom: 16,
-  },
-  receiptLogo: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#0c2d6b",
-    marginBottom: 2,
-  },
-  receiptHeaderSub: { fontSize: 11, color: "#9aa5be", marginBottom: 6 },
-  receiptId: {
-    fontSize: 10,
-    color: "#6b7a99",
-    backgroundColor: "#eef2f9",
-    padding: "2px 10px",
-    borderRadius: 20,
-    display: "inline-block",
-  },
-  rSection: { marginBottom: 14 },
-  rSectionLbl: {
-    fontSize: 10,
-    color: "#9aa5be",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    marginBottom: 6,
-    fontWeight: "500",
-  },
-  rRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    fontSize: 12,
-    padding: "3px 0",
-    borderBottom: "0.5px solid #f4f6fb",
-  },
-  rKey: { color: "#9aa5be" },
-  rVal: {
-    color: "#1a1a2e",
-    fontWeight: "500",
-    textAlign: "right",
-    maxWidth: 200,
-  },
-  receiptFooter: {
-    textAlign: "center",
-    fontSize: 10,
-    color: "#9aa5be",
-    borderTop: "0.5px solid #eef2f9",
-    paddingTop: 12,
-    marginTop: 14,
-    lineHeight: 1.6,
-  },
-  printActions: { display: "flex", gap: 10, marginTop: 14 },
-  printBtn: {
-    flex: 2,
-    padding: 10,
-    backgroundColor: "#0c2d6b",
-    color: "#fff",
-    border: "none",
-    borderRadius: 8,
-    fontSize: 13,
-    cursor: "pointer",
-  },
-  backLinkBtn: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: "#fff",
-    color: "#4a5878",
-    border: "0.5px solid #c8d8f0",
-    borderRadius: 8,
-    fontSize: 13,
-    cursor: "pointer",
-  },
-};

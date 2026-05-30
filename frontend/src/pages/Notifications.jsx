@@ -4,278 +4,193 @@ import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "../api/client";
+import { c, g } from "../theme";
 
-export default function Notifications({ user, onBack }) {
-  const [notifications, setNotifications] = useState([]);
+const relTime = (d) => {
+  const diff = Date.now() - new Date(d).getTime();
+  const m = Math.floor(diff / 60000),
+    h = Math.floor(diff / 3600000),
+    days = Math.floor(diff / 86400000);
+  if (m < 1) return "Just now";
+  if (m < 60) return `${m}m ago`;
+  if (h < 24) return `${h}h ago`;
+  if (days === 1) return "Yesterday";
+  return new Date(d).toLocaleDateString();
+};
+
+export default function Notifications({ user }) {
+  const [notifs, setNotifs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getNotifications(user.user_id).then((res) => {
-      setNotifications(res.data);
+    getNotifications(user.user_id).then((r) => {
+      setNotifs(r.data);
       setLoading(false);
     });
   }, []);
 
-  const handleMarkRead = async (notificationId) => {
-    await markNotificationRead(notificationId);
-    setNotifications((prev) =>
-      prev.map((n) =>
-        n.notification_id === notificationId ? { ...n, is_read: true } : n,
-      ),
+  const markRead = async (id) => {
+    await markNotificationRead(id);
+    setNotifs((p) =>
+      p.map((n) => (n.notification_id === id ? { ...n, is_read: true } : n)),
     );
   };
 
-  const handleMarkAllRead = async () => {
+  const markAll = async () => {
     await markAllNotificationsRead(user.user_id);
-    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    setNotifs((p) => p.map((n) => ({ ...n, is_read: true })));
   };
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
-
-  const getRelativeTime = (dateStr) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    if (mins < 1) return "Just now";
-    if (mins < 60) return `${mins} minute${mins !== 1 ? "s" : ""} ago`;
-    if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
-    if (days === 1) return "Yesterday";
-    return new Date(dateStr).toLocaleDateString();
-  };
+  const unread = notifs.filter((n) => !n.is_read).length;
 
   return (
-    <div style={s.page}>
-      {/* ── Navbar ── */}
-      <nav style={s.nav}>
-        <div style={s.navLeft}>
-          <div style={s.nuCircle}>
-            <span style={s.nuText}>NU</span>
-          </div>
-          <div style={s.navDiv} />
-          <span style={s.brand}>I-FAST</span>
-          <span style={s.navSub}>Lost &amp; Found Portal</span>
+    <div className="fade-up">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+          gap: 14,
+          marginBottom: 28,
+        }}
+      >
+        <div>
+          <h1
+            style={{
+              fontFamily: c.fh,
+              fontSize: 26,
+              fontWeight: 700,
+              color: c.text,
+              marginBottom: 6,
+            }}
+          >
+            Notifications
+          </h1>
+          <p style={{ fontSize: 13, color: c.text2 }}>
+            Updates on your claims and campus activity
+          </p>
         </div>
-        <div style={s.navRight}>
-          <span style={s.userLabel}>
-            {user.name} ({user.role})
-          </span>
-          {unreadCount > 0 && (
-            <button style={s.markAllBtn} onClick={handleMarkAllRead}>
-              Mark all read
-            </button>
-          )}
-          <button style={s.backBtn} onClick={onBack}>
-            ← Back to Items
+        {unread > 0 && (
+          <button
+            onClick={markAll}
+            style={{
+              padding: "9px 18px",
+              background: "rgba(0,229,176,0.10)",
+              border: `1px solid rgba(0,229,176,0.22)`,
+              borderRadius: 8,
+              color: c.teal,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            Mark all read ({unread})
           </button>
-        </div>
-      </nav>
-
-      {/* ── Body ── */}
-      <div style={s.body}>
-        {/* Page header */}
-        <div style={s.pageHead}>
-          <div>
-            <h2 style={s.pageTitle}>Notifications</h2>
-            <p style={s.pageSub}>Updates on your claims and activity</p>
-          </div>
-          {!loading && (
-            <span style={unreadCount > 0 ? s.unreadBadge : s.adminBadge}>
-              {unreadCount > 0 ? `${unreadCount} unread` : "All read"}
-            </span>
-          )}
-        </div>
-
-        {/* Section label */}
-        {!loading && notifications.length > 0 && (
-          <p style={s.sectionLbl}>All notifications</p>
-        )}
-
-        {/* Loading */}
-        {loading && <p style={s.empty}>Loading...</p>}
-
-        {/* Empty state */}
-        {!loading && notifications.length === 0 && (
-          <div style={s.emptyBox}>
-            <div style={s.emptyIcon}>🔔</div>
-            <p style={s.emptyTitle}>No notifications yet</p>
-            <p style={s.emptySub}>
-              You'll be notified here when your claims are reviewed.
-            </p>
-          </div>
-        )}
-
-        {/* Notifications list */}
-        {!loading && notifications.length > 0 && (
-          <div style={s.list}>
-            {notifications.map((n) => (
-              <div
-                key={n.notification_id}
-                style={n.is_read ? s.cardRead : s.cardUnread}
-              >
-                <div style={s.notifRow}>
-                  <div style={n.is_read ? s.dotRead : s.dotUnread} />
-                  <div style={{ flex: 1 }}>
-                    <p style={n.is_read ? s.msgRead : s.msgUnread}>
-                      {n.message}
-                    </p>
-                    <p style={s.time}>{getRelativeTime(n.created_at)}</p>
-                    {!n.is_read && (
-                      <div style={s.actions}>
-                        <button
-                          style={s.markReadBtn}
-                          onClick={() => handleMarkRead(n.notification_id)}
-                        >
-                          Mark as read
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         )}
       </div>
+
+      {loading && (
+        <div style={g.empty}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              border: `3px solid ${c.teal}`,
+              borderTopColor: "transparent",
+              borderRadius: "50%",
+              animation: "spin 0.8s linear infinite",
+              margin: "0 auto 16px",
+            }}
+          />
+        </div>
+      )}
+
+      {!loading && notifs.length === 0 && (
+        <div style={g.empty}>
+          <span style={g.emptyIcon}>🔔</span>
+          <p style={g.emptyTitle}>No notifications yet</p>
+          <p style={g.emptySub}>
+            You'll be notified here when your claims are reviewed.
+          </p>
+        </div>
+      )}
+
+      {!loading && notifs.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {notifs.map((n, i) => (
+            <div
+              key={n.notification_id}
+              className="fade-up"
+              style={{
+                background: n.is_read ? c.surface : "rgba(0,229,176,0.05)",
+                borderRadius: 12,
+                border: n.is_read
+                  ? `1px solid ${c.border}`
+                  : `1px solid rgba(0,229,176,0.15)`,
+                borderLeft: n.is_read
+                  ? `1px solid ${c.border}`
+                  : `3px solid ${c.teal}`,
+                padding: "16px 20px",
+                opacity: n.is_read ? 0.65 : 1,
+                display: "flex",
+                gap: 14,
+                alignItems: "flex-start",
+                animationDelay: `${i * 0.04}s`,
+                transition: "opacity 0.2s",
+              }}
+            >
+              {/* Dot */}
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: n.is_read ? c.text3 : c.teal,
+                  flexShrink: 0,
+                  marginTop: 5,
+                  boxShadow: n.is_read ? "none" : `0 0 8px ${c.teal}`,
+                }}
+              />
+
+              <div style={{ flex: 1 }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: n.is_read ? c.text2 : c.text,
+                    lineHeight: 1.6,
+                    marginBottom: 6,
+                  }}
+                >
+                  {n.message}
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <span style={{ fontSize: 11, color: c.text3 }}>
+                    {relTime(n.created_at)}
+                  </span>
+                  {!n.is_read && (
+                    <button
+                      onClick={() => markRead(n.notification_id)}
+                      style={{
+                        padding: "2px 10px",
+                        background: "rgba(0,229,176,0.08)",
+                        border: `1px solid rgba(0,229,176,0.18)`,
+                        borderRadius: 99,
+                        color: c.teal,
+                        fontSize: 10,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Mark read
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-
-const s = {
-  page: { backgroundColor: "#eef2f9", minHeight: "100vh" },
-  nav: {
-    backgroundColor: "#0c2d6b",
-    padding: "10px 24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  navLeft: { display: "flex", alignItems: "center", gap: 10 },
-  nuCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: "50%",
-    backgroundColor: "#0c2d6b",
-    border: "2px solid #1a9e75",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nuText: { fontSize: 11, fontWeight: "500", color: "#fff" },
-  navDiv: { width: 1, height: 26, backgroundColor: "rgba(255,255,255,0.2)" },
-  brand: { color: "#fff", fontSize: 14, fontWeight: "500", letterSpacing: 1 },
-  navSub: { color: "rgba(255,255,255,0.45)", fontSize: 11, marginLeft: 2 },
-  navRight: { display: "flex", alignItems: "center", gap: 10 },
-  userLabel: { color: "rgba(255,255,255,0.6)", fontSize: 11 },
-  markAllBtn: {
-    padding: "5px 12px",
-    borderRadius: 6,
-    fontSize: 11,
-    background: "#1a9e75",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-  },
-  backBtn: {
-    padding: "5px 14px",
-    borderRadius: 6,
-    fontSize: 11,
-    background: "rgba(255,255,255,0.1)",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-  },
-  body: { padding: 24 },
-  pageHead: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-  pageTitle: { fontSize: 18, fontWeight: "500", color: "#0c2d6b", margin: 0 },
-  pageSub: { fontSize: 12, color: "#9aa5be", marginTop: 2, marginBottom: 0 },
-  adminBadge: {
-    backgroundColor: "#e6edf9",
-    color: "#0c2d6b",
-    padding: "6px 14px",
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  unreadBadge: {
-    backgroundColor: "#faeeda",
-    color: "#633806",
-    padding: "6px 14px",
-    borderRadius: 20,
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  sectionLbl: {
-    fontSize: 11,
-    fontWeight: "500",
-    color: "#4a5878",
-    letterSpacing: "0.5px",
-    textTransform: "uppercase",
-    marginBottom: 12,
-  },
-  empty: { color: "#9aa5be", textAlign: "center", marginTop: 60 },
-  emptyBox: { textAlign: "center", marginTop: 80 },
-  emptyIcon: { fontSize: 36, marginBottom: 10 },
-  emptyTitle: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#0c2d6b",
-    marginBottom: 4,
-  },
-  emptySub: { fontSize: 13, color: "#9aa5be" },
-  list: { display: "flex", flexDirection: "column", gap: 10 },
-  cardUnread: {
-    backgroundColor: "#f0f4ff",
-    borderRadius: "0 10px 10px 0",
-    border: "0.5px solid #c8d8f0",
-    borderLeft: "3px solid #0c2d6b",
-    padding: "14px 18px",
-  },
-  cardRead: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    border: "0.5px solid #c8d8f0",
-    padding: "14px 18px",
-    opacity: 0.75,
-  },
-  notifRow: { display: "flex", gap: 12, alignItems: "flex-start" },
-  dotUnread: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    backgroundColor: "#0c2d6b",
-    flexShrink: 0,
-    marginTop: 4,
-  },
-  dotRead: {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    backgroundColor: "#c8d8f0",
-    flexShrink: 0,
-    marginTop: 4,
-  },
-  msgUnread: {
-    fontSize: 13,
-    color: "#1a1a2e",
-    lineHeight: 1.6,
-    marginBottom: 4,
-  },
-  msgRead: { fontSize: 13, color: "#6b7a99", lineHeight: 1.6, marginBottom: 4 },
-  time: { fontSize: 11, color: "#9aa5be" },
-  actions: { display: "flex", justifyContent: "flex-end", marginTop: 8 },
-  markReadBtn: {
-    padding: "4px 12px",
-    backgroundColor: "#0c2d6b",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
-    fontSize: 11,
-    cursor: "pointer",
-  },
-};
