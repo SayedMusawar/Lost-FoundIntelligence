@@ -7,4 +7,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+WORKDIR /app/backend
+
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
