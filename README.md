@@ -1,10 +1,10 @@
-# 🔍 FAST Peshawar — Lost & Found Intelligence System
+# FAST Peshawar — Lost & Found Intelligence System
 
 > A full-stack web application that digitizes the Lost & Found workflow at FAST Peshawar campus, replacing the manual register-based system at the Student Affairs office with a structured, database-driven solution.
 
 ---
 
-## 👥 Group Information
+## Group Information
 
 | Name | Roll Number |
 |---|---|
@@ -15,10 +15,11 @@
 
 ---
 
-## 📸 Application Preview
+## Application Preview
 
 <!-- Add a banner/hero screenshot of the app here -->
 <!-- Example: ![App Banner](screenshots/banner.png) -->
+<img width="1919" height="923" alt="Screenshot from 2026-05-30 22-38-44" src="https://github.com/user-attachments/assets/45b22164-3a0c-42dc-835a-4f082584e94c" />
 
 > _Screenshot: Homepage / Item Listing_
 
@@ -26,13 +27,13 @@
 
 ---
 
-## 📋 Project Description
+## Project Description
 
 The system manages the complete lifecycle of a lost item — from registration by staff, to student claim submission, admin verification, and digital receipt generation. It enforces role-based access control, maintains audit trails, and sends in-app notifications to users on claim status updates.
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 | Layer | Technology |
 |---|---|
@@ -46,17 +47,17 @@ The system manages the complete lifecycle of a lost item — from registration b
 
 ---
 
-## ✨ Features
+## Features
 
-- 📦 Register found items with category, location, date, and description
-- 🔎 Search and filter items by keyword, category, and campus location
-- 📝 Submit claim requests with ownership proof description
-- 🛡️ Admin dashboard for claim approval and rejection
-- 🧾 Digital receipt generation with print support
-- 📁 My Claims page for students to track claim status
-- 🔔 In-app notifications on claim approval or rejection
-- 🔐 Role-based access control — admin, staff, student, faculty
-- 🔒 Secure password hashing using SHA-256
+- Register found items with category, location, date, and description
+- Search and filter items by keyword, category, and campus location
+- Submit claim requests with ownership proof description
+- Admin dashboard for claim approval and rejection
+- Digital receipt generation with print support
+- My Claims page for students to track claim status
+- In-app notifications on claim approval or rejection
+- Role-based access control — admin, staff, student, faculty
+- Secure password hashing using SHA-256
 
 ---
 
@@ -65,40 +66,52 @@ The system manages the complete lifecycle of a lost item — from registration b
 ### Login Page
 <!-- Add screenshot here -->
 > _Screenshot: Login screen_
+<img width="1919" height="923" alt="Screenshot from 2026-05-30 22-40-01" src="https://github.com/user-attachments/assets/ae50863a-945e-4a06-950b-ab5b7ad4b08b" />
+
 
 ---
 
 ### Item Listing / Browse
 <!-- Add screenshot here -->
+<img width="1919" height="923" alt="Screenshot from 2026-05-30 22-40-33" src="https://github.com/user-attachments/assets/3dbb0e86-e7a6-4b97-92f4-528bcc02c6ce" />
+
 > _Screenshot: Public item listing with search & filter_
 
 ---
 
 ### Register Found Item (Staff)
 <!-- Add screenshot here -->
+<img width="1919" height="923" alt="Screenshot from 2026-05-30 22-41-09" src="https://github.com/user-attachments/assets/ca3c06ce-20a6-4100-925a-f7fa76316c00" />
+
 > _Screenshot: Staff form to register a found item_
 
 ---
 
 ### Admin Dashboard
 <!-- Add screenshot here -->
+<img width="1919" height="923" alt="Screenshot from 2026-05-30 22-41-42" src="https://github.com/user-attachments/assets/c2b48084-1643-4a04-9ddd-5daa9407a0bd" />
+
 > _Screenshot: Admin claim review panel_
 
 ---
 
 ### My Claims (Student)
 <!-- Add screenshot here -->
+<img width="1919" height="923" alt="Screenshot from 2026-05-30 22-42-08" src="https://github.com/user-attachments/assets/33f6eff8-243c-4a8a-8f66-496d075c0f10" />
+
 > _Screenshot: Student's claim tracking page_
 
 ---
 
 ### Digital Receipt
 <!-- Add screenshot here -->
+<img width="1919" height="923" alt="Screenshot from 2026-05-30 22-42-49" src="https://github.com/user-attachments/assets/c98d066e-30ba-44fc-9d87-42a806f3bd76" />
+
 > _Screenshot: Generated receipt on claim approval_
 
 ---
 
-## 🗂️ CRUD Operations
+## CRUD Operations
 
 | Operation | Where Implemented |
 |---|---|
@@ -109,7 +122,7 @@ The system manages the complete lifecycle of a lost item — from registration b
 
 ---
 
-## 🗃️ Database Schema
+## Database Schema
 
 **9 Tables:**
 `USER`, `ITEM`, `CATEGORY`, `ITEM_IMAGE`, `CLAIM_REQUEST`, `RECEIPT`, `AUDIT_LOG`, `NOTIFICATION`, `ITEM_STATUS_HISTORY`
@@ -121,12 +134,14 @@ The system manages the complete lifecycle of a lost item — from registration b
 
 <!-- Add an ER Diagram image here -->
 > _Diagram: Entity-Relationship (ER) Diagram_
+<img width="647" height="650" alt="Screenshot from 2026-05-30 22-43-46" src="https://github.com/user-attachments/assets/aeeb0002-0e68-4377-b6c7-b8b8f226692f" />
+
 
 <!-- Add ER diagram screenshot here -->
 
 ---
 
-## ⚙️ Prerequisites — Install These First
+## Prerequisites — Install These First
 
 Run these commands on Ubuntu:
 
@@ -145,7 +160,7 @@ sudo apt install -y nodejs
 
 ---
 
-## 🚀 Installation & Running the App
+## Installation & Running the App
 
 ### Step 1 — Database Setup
 
@@ -215,9 +230,6 @@ uvicorn main:app --reload
 - Backend runs at: `http://127.0.0.1:8000`
 - Interactive API docs at: `http://127.0.0.1:8000/docs`
 
-<!-- Add a screenshot of the Swagger/API docs here -->
-> _Screenshot: FastAPI interactive docs at /docs_
-
 ---
 
 ### Step 3 — Frontend Setup
@@ -245,7 +257,7 @@ Go to `http://localhost:5173`
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 lost-found/
@@ -265,9 +277,16 @@ lost-found/
 │       └── notifications.py   # Notification read/unread
 └── frontend/
     └── src/
+        ├── App.css
         ├── App.jsx             # Page routing + role guards
+        ├── index.css
+        ├── main.jsx
+        ├── theme.js
         ├── api/
         │   └── client.js       # All Axios API calls
+        └── components/
+            ├── Layout.jsx
+            ├── Navbar.jsx
         └── pages/
             ├── Login.jsx
             ├── ItemList.jsx
@@ -281,7 +300,7 @@ lost-found/
 
 ---
 
-## 🔒 SQL Injection — Is This App Secure?
+## SQL Injection — Is This App Secure?
 
 **Yes. This application is fully protected against SQL injection.**
 
@@ -306,7 +325,7 @@ The `%s` placeholder tells psycopg2 to treat the value as data, never as executa
 
 ---
 
-## 🔄 System Workflow
+## System Workflow
 
 ```
 1. Staff registers a found item with details and campus location
@@ -324,12 +343,9 @@ The `%s` placeholder tells psycopg2 to treat the value as data, never as executa
 7. Item status updates to `claimed` and the case is closed
 ```
 
-<!-- Add a workflow diagram image here -->
-> _Diagram: System workflow / flowchart_
-
 ---
 
-## 👨‍💻 Developed By
+## Developed By
 
 | Name | Roll Number |
 |---|---|
