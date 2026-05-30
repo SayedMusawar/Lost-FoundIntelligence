@@ -1,25 +1,38 @@
-# FAST Peshawar — Lost & Found Intelligence System
+# 🔍 FAST Peshawar — Lost & Found Intelligence System
 
-A full-stack web application that digitizes the Lost & Found workflow at FAST Peshawar campus, replacing the manual register-based system at the Student Affairs office with a structured, database-driven solution.
+> A full-stack web application that digitizes the Lost & Found workflow at FAST Peshawar campus, replacing the manual register-based system at the Student Affairs office with a structured, database-driven solution.
 
 ---
 
-## Group Information
+## 👥 Group Information
 
-- **Group Members:**
-  - Muhammad Musawar Ali Shah — 24P-0619
-  - Muhammad Ahmed Asim — 24P-0740
+| Name | Roll Number |
+|---|---|
+| Muhammad Musawar Ali Shah | 24P-0619 |
+| Muhammad Ahmed Asim | 24P-0740 |
+
+**GitHub Repository:** [Lost-Found Intelligence](https://github.com/SayedMusawar/Lost-FoundIntelligence)
+
 ---
 
-## Project Description
+## 📸 Application Preview
+
+<!-- Add a banner/hero screenshot of the app here -->
+<!-- Example: ![App Banner](screenshots/banner.png) -->
+
+> _Screenshot: Homepage / Item Listing_
+
+<!-- Add screenshot here -->
+
+---
+
+## 📋 Project Description
 
 The system manages the complete lifecycle of a lost item — from registration by staff, to student claim submission, admin verification, and digital receipt generation. It enforces role-based access control, maintains audit trails, and sends in-app notifications to users on claim status updates.
 
-**GitHub Repository:** https://github.com/SayedMusawar/Lost-FoundIntelligence
-
 ---
 
-## Technologies Used
+## 🛠️ Technologies Used
 
 | Layer | Technology |
 |---|---|
@@ -33,44 +46,87 @@ The system manages the complete lifecycle of a lost item — from registration b
 
 ---
 
-## Features
+## ✨ Features
 
-- Register found items with category, location, date, and description
-- Search and filter items by keyword, category, and campus location
-- Submit claim requests with ownership proof description
-- Admin dashboard for claim approval and rejection
-- Digital receipt generation with print support
-- My Claims page for students to track claim status
-- In-app notifications on claim approval or rejection
-- Role-based access control — admin, staff, student, faculty
-- Secure password hashing using SHA-256
+- 📦 Register found items with category, location, date, and description
+- 🔎 Search and filter items by keyword, category, and campus location
+- 📝 Submit claim requests with ownership proof description
+- 🛡️ Admin dashboard for claim approval and rejection
+- 🧾 Digital receipt generation with print support
+- 📁 My Claims page for students to track claim status
+- 🔔 In-app notifications on claim approval or rejection
+- 🔐 Role-based access control — admin, staff, student, faculty
+- 🔒 Secure password hashing using SHA-256
 
 ---
 
-## CRUD Operations
+## 📸 Screenshots
+
+### Login Page
+<!-- Add screenshot here -->
+> _Screenshot: Login screen_
+
+---
+
+### Item Listing / Browse
+<!-- Add screenshot here -->
+> _Screenshot: Public item listing with search & filter_
+
+---
+
+### Register Found Item (Staff)
+<!-- Add screenshot here -->
+> _Screenshot: Staff form to register a found item_
+
+---
+
+### Admin Dashboard
+<!-- Add screenshot here -->
+> _Screenshot: Admin claim review panel_
+
+---
+
+### My Claims (Student)
+<!-- Add screenshot here -->
+> _Screenshot: Student's claim tracking page_
+
+---
+
+### Digital Receipt
+<!-- Add screenshot here -->
+> _Screenshot: Generated receipt on claim approval_
+
+---
+
+## 🗂️ CRUD Operations
 
 | Operation | Where Implemented |
 |---|---|
-| CREATE | Register items, submit claims, issue receipts, create notifications, add users |
-| READ | Browse items, search/filter, view claims, view receipts, view notifications |
-| UPDATE | Approve/reject claims, mark item as claimed, mark notifications as read |
-| DELETE | Cascade delete on item removal (images, status history) |
+| **CREATE** | Register items, submit claims, issue receipts, create notifications, add users |
+| **READ** | Browse items, search/filter, view claims, view receipts, view notifications |
+| **UPDATE** | Approve/reject claims, mark item as claimed, mark notifications as read |
+| **DELETE** | Cascade delete on item removal (images, status history) |
 
 ---
 
-## Database Schema
+## 🗃️ Database Schema
 
 **9 Tables:**
 `USER`, `ITEM`, `CATEGORY`, `ITEM_IMAGE`, `CLAIM_REQUEST`, `RECEIPT`, `AUDIT_LOG`, `NOTIFICATION`, `ITEM_STATUS_HISTORY`
 
 **Custom ENUMs:**
-`user_role` (student, faculty, staff, admin),
-`item_status` (found, claimed, closed, expired),
-`claim_status` (pending, approved, rejected)
+- `user_role` → student, faculty, staff, admin
+- `item_status` → found, claimed, closed, expired
+- `claim_status` → pending, approved, rejected
+
+<!-- Add an ER Diagram image here -->
+> _Diagram: Entity-Relationship (ER) Diagram_
+
+<!-- Add ER diagram screenshot here -->
 
 ---
 
-## Prerequisites — Install These First
+## ⚙️ Prerequisites — Install These First
 
 Run these commands on Ubuntu:
 
@@ -89,7 +145,7 @@ sudo apt install -y nodejs
 
 ---
 
-## Installation & Running the App
+## 🚀 Installation & Running the App
 
 ### Step 1 — Database Setup
 
@@ -156,8 +212,11 @@ cd backend
 uvicorn main:app --reload
 ```
 
-Backend runs at: `http://127.0.0.1:8000`
-Interactive API docs at: `http://127.0.0.1:8000/docs`
+- Backend runs at: `http://127.0.0.1:8000`
+- Interactive API docs at: `http://127.0.0.1:8000/docs`
+
+<!-- Add a screenshot of the Swagger/API docs here -->
+> _Screenshot: FastAPI interactive docs at /docs_
 
 ---
 
@@ -186,7 +245,7 @@ Go to `http://localhost:5173`
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 lost-found/
@@ -222,7 +281,7 @@ lost-found/
 
 ---
 
-## SQL Injection — Is This App Secure?
+## 🔒 SQL Injection — Is This App Secure?
 
 **Yes. This application is fully protected against SQL injection.**
 
@@ -239,29 +298,42 @@ execute_query(
 
 The `%s` placeholder tells psycopg2 to treat the value as data, never as executable SQL. Even if a user types `' OR '1'='1` into the email field, it is passed as a plain string — the database will not execute it.
 
-**What SQL Injection is:**
-An attack where malicious SQL is inserted into an input field to manipulate the database — for example, bypassing login, dumping data, or deleting tables.
-**How we prevent it:**
-Parameterized queries — the driver escapes all user input automatically before it reaches the database engine.
+| Threat | Protection |
+|---|---|
+| SQL Injection | Parameterized queries via psycopg2 |
+| Password theft | SHA-256 hashing — plain passwords never stored |
+| Unauthorized access | Role-based access control on all routes |
 
 ---
 
-## System Workflow
+## 🔄 System Workflow
 
+```
 1. Staff registers a found item with details and campus location
+        ↓
 2. Students browse and search the public item listing
+        ↓
 3. A student submits a claim describing why the item is theirs
+        ↓
 4. Admin reviews the claim in the Admin Dashboard
-5. Admin approves or rejects — student gets an in-app notification
+        ↓
+5. Admin approves or rejects → student gets an in-app notification
+        ↓
 6. Staff issues a digital receipt when student collects the item
+        ↓
 7. Item status updates to `claimed` and the case is closed
-
----
-
-## Developed By
-Muhammad Musawar Ali Shah — 24P-0619
-Muhammad Ahmed Asim — 24P-0740
-FAST Peshawar — Database Systems Lab Project, Spring 2026
 ```
 
+<!-- Add a workflow diagram image here -->
+> _Diagram: System workflow / flowchart_
+
 ---
+
+## 👨‍💻 Developed By
+
+| Name | Roll Number |
+|---|---|
+| Muhammad Musawar Ali Shah | 24P-0619 |
+| Muhammad Ahmed Asim | 24P-0740 |
+
+**FAST Peshawar — Database Systems Lab Project, Spring 2026**
