@@ -1,16 +1,12 @@
+import os
 import psycopg2
 import psycopg2.extras
 
-DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "database": "lost_found",    # ← your DB name in pgAdmin
-    "user": "postgres",
-    "password": "12345"  # ← your pgAdmin password
-}
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
 
 def get_connection():
-    return psycopg2.connect(**DB_CONFIG)
+    return psycopg2.connect(DATABASE_URL)
 
 def execute_query(query, params=None, fetch=None):
     conn = get_connection()
