@@ -7,13 +7,16 @@ import AdminDashboard from "./pages/AdminDashboard";
 import IssueReceipt from "./pages/IssueReceipt";
 import MyClaims from "./pages/MyClaims";
 import Notifications from "./pages/Notifications";
+import Layout from "./components/Layout";
 
-const CAN_REGISTER = ["staff", "admin"];
-const CAN_CLAIM = ["student", "faculty"];
-const CAN_ADMIN = ["admin"];
-const CAN_RECEIPT = ["admin", "staff"];
-const CAN_MYCLAIMS = ["student", "faculty"];
-const CAN_NOTIFICATIONS = ["student", "faculty"];
+const ROLE_PAGES = {
+  register: ["staff", "admin"],
+  claim: ["student", "faculty"],
+  admin: ["admin"],
+  receipt: ["admin", "staff"],
+  myclaims: ["student", "faculty"],
+  notifications: ["student", "faculty"],
+};
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -26,12 +29,9 @@ export default function App() {
     setSelectedItem(null);
   };
 
-  const goTo = (targetPage, allowedRoles) => {
-    if (allowedRoles.includes(user?.role)) {
-      setPage(targetPage);
-    } else {
-      alert(`Access denied. Only ${allowedRoles.join("/")} can access this.`);
-    }
+  const navigate = (target) => {
+    const allowed = ROLE_PAGES[target];
+    if (!allowed || allowed.includes(user?.role)) setPage(target);
   };
 
   if (!user)
@@ -44,83 +44,46 @@ export default function App() {
       />
     );
 
-  if (page === "register") {
-    if (!CAN_REGISTER.includes(user.role)) {
-      setPage("items");
-      return null;
-    }
-    return <RegisterItem user={user} onBack={() => setPage("items")} />;
-  }
-
-  if (page === "claim") {
-    if (!CAN_CLAIM.includes(user.role)) {
-      setPage("items");
-      return null;
-    }
+  const pageContent = () => {
+    if (page === "register" && ["staff", "admin"].includes(user.role))
+      return <RegisterItem user={user} onBack={() => setPage("items")} />;
+    if (page === "claim" && ["student", "faculty"].includes(user.role))
+      return (
+        <ClaimItem
+          item={selectedItem}
+          user={user}
+          onBack={() => setPage("items")}
+        />
+      );
+    if (page === "admin" && user.role === "admin")
+      return (
+        <AdminDashboard user={user} onReceipt={() => setPage("receipt")} />
+      );
+    if (page === "receipt" && ["admin", "staff"].includes(user.role))
+      return <IssueReceipt user={user} onBack={() => setPage("admin")} />;
+    if (page === "myclaims" && ["student", "faculty"].includes(user.role))
+      return <MyClaims user={user} />;
+    if (page === "notifications" && ["student", "faculty"].includes(user.role))
+      return <Notifications user={user} />;
     return (
-      <ClaimItem
-        item={selectedItem}
+      <ItemList
         user={user}
-        onBack={() => setPage("items")}
-      />
-    );
-  }
-
-  if (page === "admin") {
-    if (!CAN_ADMIN.includes(user.role)) {
-      setPage("items");
-      return null;
-    }
-    return (
-      <AdminDashboard
-        user={user}
-        onBack={() => setPage("items")}
-        onReceipt={() => setPage("receipt")}
-        onLogout={logout}
-      />
-    );
-  }
-
-  if (page === "receipt") {
-    if (!CAN_RECEIPT.includes(user.role)) {
-      setPage("items");
-      return null;
-    }
-    return <IssueReceipt user={user} onBack={() => setPage("admin")} />;
-  }
-
-  if (page === "myclaims") {
-    if (!CAN_MYCLAIMS.includes(user.role)) {
-      setPage("items");
-      return null;
-    }
-    return <MyClaims user={user} onBack={() => setPage("items")} />;
-  }
-
-  if (page === "notifications") {
-    if (!CAN_NOTIFICATIONS.includes(user.role)) {
-      setPage("items");
-      return null;
-    }
-    return <Notifications user={user} onBack={() => setPage("items")} />;
-  }
-
-  return (
-    <ItemList
-      user={user}
-      onLogout={logout}
-      onRegister={() => goTo("register", CAN_REGISTER)}
-      onClaim={(item) => {
-        if (CAN_CLAIM.includes(user.role)) {
+        onClaim={(item) => {
           setSelectedItem(item);
           setPage("claim");
-        } else {
-          alert("Only students and faculty can submit claims.");
-        }
-      }}
-      onAdmin={() => goTo("admin", CAN_ADMIN)}
-      onMyClaims={() => goTo("myclaims", CAN_MYCLAIMS)}
-      onNotifications={() => goTo("notifications", CAN_NOTIFICATIONS)}
-    />
+        }}
+      />
+    );
+  };
+
+  return (
+    <Layout
+      user={user}
+      currentPage={page}
+      onNavigate={navigate}
+      onLogout={logout}
+    >
+      {pageContent()}
+    </Layout>
   );
 }
