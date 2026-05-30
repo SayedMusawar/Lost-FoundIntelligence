@@ -10,6 +10,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://lost-found-intelligence.vercel.app",
+        "https://lost-found-intelligence-1e93b94q7-p240619-9725s-projects.vercel.app",
         "http://localhost:5173",
     ],
     allow_credentials=True,
