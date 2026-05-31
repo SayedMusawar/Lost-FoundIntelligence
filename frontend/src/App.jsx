@@ -9,15 +9,6 @@ import MyClaims from "./pages/MyClaims";
 import Notifications from "./pages/Notifications";
 import Layout from "./components/Layout";
 
-const ROLE_PAGES = {
-  register: ["staff", "admin"],
-  claim: ["student", "faculty"],
-  admin: ["admin"],
-  receipt: ["admin", "staff"],
-  myclaims: ["student", "faculty"],
-  notifications: ["student", "faculty"],
-};
-
 export default function App() {
   const [user, setUser] = useState(null);
   const [page, setPage] = useState("items");
@@ -28,11 +19,7 @@ export default function App() {
     setPage("items");
     setSelectedItem(null);
   };
-
-  const navigate = (target) => {
-    const allowed = ROLE_PAGES[target];
-    if (!allowed || allowed.includes(user?.role)) setPage(target);
-  };
+  const navigate = (target) => setPage(target);
 
   if (!user)
     return (
@@ -44,9 +31,9 @@ export default function App() {
       />
     );
 
-  const pageContent = () => {
+  const content = () => {
     if (page === "register" && ["staff", "admin"].includes(user.role))
-      return <RegisterItem user={user} onBack={() => setPage("items")} />;
+      return <RegisterItem user={user} />;
     if (page === "claim" && ["student", "faculty"].includes(user.role))
       return (
         <ClaimItem
@@ -83,7 +70,7 @@ export default function App() {
       onNavigate={navigate}
       onLogout={logout}
     >
-      {pageContent()}
+      {content()}
     </Layout>
   );
 }
