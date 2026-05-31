@@ -2,16 +2,16 @@ import { useState, useEffect } from "react";
 import { getNotifications } from "../api/client";
 import { c, tr } from "../theme";
 
-const NAV_ITEMS = {
+const NAV = {
   admin: [
     { id: "items", icon: "⊞", label: "Browse Items" },
-    { id: "register", icon: "+", label: "Register Item" },
+    { id: "register", icon: "＋", label: "Register Item" },
     { id: "admin", icon: "◈", label: "Dashboard" },
     { id: "receipt", icon: "▤", label: "Issue Receipt" },
   ],
   staff: [
     { id: "items", icon: "⊞", label: "Browse Items" },
-    { id: "register", icon: "+", label: "Register Item" },
+    { id: "register", icon: "＋", label: "Register Item" },
   ],
   student: [
     { id: "items", icon: "⊞", label: "Browse Items" },
@@ -32,16 +32,16 @@ export default function Layout({
   onLogout,
   children,
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const [open, setOpen] = useState(true);
+  const [mobile, setMobile] = useState(false);
   const [unread, setUnread] = useState(0);
 
   useEffect(() => {
     const check = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      if (mobile) setSidebarOpen(false);
-      else setSidebarOpen(true);
+      const m = window.innerWidth < 768;
+      setMobile(m);
+      if (m) setOpen(false);
+      else setOpen(true);
     };
     check();
     window.addEventListener("resize", check);
@@ -49,24 +49,23 @@ export default function Layout({
   }, []);
 
   useEffect(() => {
-    if (user && ["student", "faculty"].includes(user.role)) {
+    if (["student", "faculty"].includes(user.role)) {
       getNotifications(user.user_id)
         .then((r) => setUnread(r.data.filter((n) => !n.is_read).length))
         .catch(() => {});
     }
   }, [user, currentPage]);
 
-  const navItems = NAV_ITEMS[user.role] || NAV_ITEMS.student;
+  const navItems = NAV[user.role] || NAV.student;
   const initials = user.name
     .split(" ")
     .map((w) => w[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
-  const sidebarW = sidebarOpen ? 240 : 0;
 
   return (
-    <div style={{ minHeight: "100vh", background: c.bg }}>
+    <div style={{ minHeight: "100vh", background: c.skyLight }}>
       {/* ── Topbar ── */}
       <header
         style={{
@@ -75,23 +74,21 @@ export default function Layout({
           left: 0,
           right: 0,
           zIndex: 300,
-          height: 56,
-          background: "rgba(8,11,18,0.90)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: `1px solid ${c.border}`,
+          height: 60,
+          background: "#ffffff",
+          borderBottom: `1.5px solid ${c.border}`,
+          boxShadow: "0 2px 12px rgba(17,120,194,0.08)",
           display: "flex",
           alignItems: "center",
           padding: "0 20px 0 0",
-          gap: 0,
         }}
       >
         {/* Hamburger */}
         <button
-          onClick={() => setSidebarOpen((o) => !o)}
+          onClick={() => setOpen((o) => !o)}
           style={{
-            width: 56,
-            height: 56,
+            width: 60,
+            height: 60,
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
@@ -99,61 +96,67 @@ export default function Layout({
             background: "transparent",
             color: c.text2,
             fontSize: 20,
-            transition: tr,
           }}
         >
           ☰
         </button>
 
         {/* Brand */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
           <div
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: "50%",
-              background: `linear-gradient(135deg, ${c.teal}, #0099ff)`,
+              width: 34,
+              height: 34,
+              borderRadius: 8,
+              background: `linear-gradient(135deg, ${c.blue}, ${c.blueMid})`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 10,
-              fontWeight: 800,
-              color: c.bg,
-              fontFamily: c.fh,
-              boxShadow: `0 0 12px ${c.tealGlow}`,
-            }}
-          >
-            NU
-          </div>
-          <span
-            style={{
-              fontFamily: c.fh,
-              fontWeight: 800,
-              fontSize: 16,
-              color: c.text,
-              letterSpacing: "0.5px",
-            }}
-          >
-            I-FAST
-          </span>
-          <span
-            style={{
               fontSize: 11,
-              color: c.text3,
-              borderLeft: `1px solid ${c.border2}`,
-              paddingLeft: 10,
-              marginLeft: 2,
+              fontWeight: 800,
+              color: "#fff",
+              fontFamily: c.fh,
+              boxShadow: "0 2px 10px rgba(17,120,194,0.35)",
+              flexShrink: 0,
             }}
           >
-            Lost & Found Portal
-          </span>
+            LF
+          </div>
+          <div>
+            <div
+              style={{
+                fontFamily: c.fh,
+                fontWeight: 800,
+                fontSize: 14,
+                color: c.dark,
+                lineHeight: 1.1,
+                letterSpacing: "-0.2px",
+              }}
+            >
+              FAST Peshawar
+            </div>
+            <div
+              style={{ fontSize: 10, color: c.text3, letterSpacing: "0.2px" }}
+            >
+              Lost & Found Intelligence
+            </div>
+          </div>
+          <div
+            style={{
+              width: 1,
+              height: 28,
+              background: c.border,
+              margin: "0 6px",
+            }}
+          />
+          <span style={{ fontSize: 11, color: c.text3 }}>Portal</span>
         </div>
 
         <div style={{ flex: 1 }} />
 
-        {/* Right side */}
+        {/* Right */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* Notification bell */}
+          {/* Bell */}
           {["student", "faculty"].includes(user.role) && (
             <button
               onClick={() => onNavigate("notifications")}
@@ -162,8 +165,8 @@ export default function Layout({
                 width: 36,
                 height: 36,
                 borderRadius: 8,
-                background: c.surface,
-                border: `1px solid ${c.border}`,
+                background: c.surface2,
+                border: `1.5px solid ${c.border}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -176,13 +179,13 @@ export default function Layout({
                 <span
                   style={{
                     position: "absolute",
-                    top: 6,
-                    right: 6,
+                    top: 5,
+                    right: 5,
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
                     background: c.amber,
-                    border: `2px solid ${c.bg}`,
+                    border: `2px solid #fff`,
                   }}
                 />
               )}
@@ -195,25 +198,24 @@ export default function Layout({
               display: "flex",
               alignItems: "center",
               gap: 9,
-              background: c.surface,
-              border: `1px solid ${c.border}`,
+              background: c.surface2,
+              border: `1.5px solid ${c.border}`,
               borderRadius: 10,
               padding: "5px 12px 5px 6px",
             }}
           >
             <div
               style={{
-                width: 28,
-                height: 28,
+                width: 30,
+                height: 30,
                 borderRadius: "50%",
-                background: `rgba(0,229,176,0.12)`,
-                border: `1.5px solid rgba(0,229,176,0.35)`,
+                background: `linear-gradient(135deg, ${c.blue}, ${c.blueMid})`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 700,
-                color: c.teal,
+                color: "#fff",
                 fontFamily: c.fh,
               }}
             >
@@ -247,12 +249,12 @@ export default function Layout({
             onClick={onLogout}
             style={{
               padding: "7px 14px",
-              background: "rgba(255,77,77,0.08)",
-              border: "1px solid rgba(255,77,77,0.2)",
+              background: "#fdecea",
+              border: "1.5px solid #f5b8b4",
               borderRadius: 8,
-              color: "#ff6b6b",
+              color: c.red,
               fontSize: 12,
-              fontWeight: 500,
+              fontWeight: 600,
               transition: tr,
             }}
           >
@@ -261,40 +263,41 @@ export default function Layout({
         </div>
       </header>
 
-      {/* ── Sidebar ── */}
-      {/* Overlay on mobile */}
-      {isMobile && sidebarOpen && (
+      {/* ── Mobile overlay ── */}
+      {mobile && open && (
         <div
-          onClick={() => setSidebarOpen(false)}
+          onClick={() => setOpen(false)}
           style={{
             position: "fixed",
             inset: 0,
             zIndex: 250,
-            background: "rgba(0,0,0,0.6)",
+            background: "rgba(30,37,48,0.35)",
             backdropFilter: "blur(4px)",
           }}
         />
       )}
 
+      {/* ── Sidebar ── */}
       <aside
         style={{
           position: "fixed",
-          top: 56,
+          top: 60,
           left: 0,
           bottom: 0,
-          width: sidebarOpen ? 240 : 0,
-          background: c.bg2,
-          borderRight: sidebarOpen ? `1px solid ${c.border}` : "none",
+          width: open ? 248 : 0,
+          background: "#ffffff",
+          borderRight: `1.5px solid ${c.border}`,
+          boxShadow: open ? "2px 0 16px rgba(17,120,194,0.06)" : "none",
           overflow: "hidden",
           transition: "width 0.25s cubic-bezier(0.4,0,0.2,1)",
-          zIndex: isMobile ? 260 : 100,
+          zIndex: mobile ? 260 : 100,
           display: "flex",
           flexDirection: "column",
         }}
       >
         <div
           style={{
-            width: 240,
+            width: 248,
             padding: "20px 0 24px",
             display: "flex",
             flexDirection: "column",
@@ -302,25 +305,35 @@ export default function Layout({
           }}
         >
           {/* Campus tag */}
-          <div style={{ padding: "0 16px", marginBottom: 24 }}>
+          <div style={{ padding: "0 14px", marginBottom: 20 }}>
             <div
               style={{
-                padding: "10px 14px",
-                background: c.bg3,
+                padding: "12px 14px",
+                background: `linear-gradient(135deg, ${c.blue}, ${c.blueMid})`,
                 borderRadius: 10,
-                border: `1px solid ${c.border}`,
+                color: "#fff",
               }}
             >
-              <div style={{ fontSize: 10, color: c.text3, marginBottom: 3 }}>
+              <div
+                style={{
+                  fontSize: 9,
+                  opacity: 0.7,
+                  letterSpacing: "0.8px",
+                  marginBottom: 4,
+                }}
+              >
                 CAMPUS
               </div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: c.text }}>
+              <div style={{ fontSize: 12, fontWeight: 700, fontFamily: c.fh }}>
                 FAST-NUCES Peshawar
+              </div>
+              <div style={{ fontSize: 10, opacity: 0.65, marginTop: 2 }}>
+                Student Affairs Portal
               </div>
             </div>
           </div>
 
-          {/* Nav items */}
+          {/* Nav */}
           <div style={{ padding: "0 10px", flex: 1 }}>
             <div
               style={{
@@ -328,8 +341,7 @@ export default function Layout({
                 fontWeight: 600,
                 color: c.text3,
                 letterSpacing: "1px",
-                padding: "0 8px",
-                marginBottom: 8,
+                padding: "0 8px 8px",
               }}
             >
               NAVIGATION
@@ -341,23 +353,23 @@ export default function Layout({
                   key={item.id}
                   onClick={() => {
                     onNavigate(item.id);
-                    if (isMobile) setSidebarOpen(false);
+                    if (mobile) setOpen(false);
                   }}
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 12,
+                    gap: 11,
                     width: "100%",
                     padding: "11px 12px",
                     borderRadius: 8,
                     marginBottom: 3,
-                    background: active ? `rgba(0,229,176,0.10)` : "transparent",
+                    background: active ? c.blueLight : "transparent",
                     border: active
-                      ? `1px solid rgba(0,229,176,0.18)`
-                      : "1px solid transparent",
-                    color: active ? c.teal : c.text2,
+                      ? `1.5px solid ${c.border2}`
+                      : "1.5px solid transparent",
+                    color: active ? c.blue : c.text2,
                     fontSize: 13.5,
-                    fontWeight: active ? 600 : 400,
+                    fontWeight: active ? 700 : 400,
                     fontFamily: c.fb,
                     cursor: "pointer",
                     transition: tr,
@@ -384,7 +396,7 @@ export default function Layout({
                         height: 18,
                         borderRadius: 99,
                         background: c.amber,
-                        color: c.bg,
+                        color: "#fff",
                         fontSize: 10,
                         fontWeight: 700,
                         display: "flex",
@@ -404,8 +416,8 @@ export default function Layout({
                         top: "50%",
                         transform: "translateY(-50%)",
                         width: 3,
-                        height: 20,
-                        background: c.teal,
+                        height: 22,
+                        background: c.blue,
                         borderRadius: "0 3px 3px 0",
                       }}
                     />
@@ -416,14 +428,23 @@ export default function Layout({
           </div>
 
           {/* Footer */}
-          <div style={{ padding: "0 10px", marginTop: 16 }}>
+          <div style={{ padding: "0 10px" }}>
             <div
-              style={{
-                height: 1,
-                background: c.border,
-                margin: "0 8px 14px",
-              }}
+              style={{ height: 1, background: c.border, margin: "0 8px 14px" }}
             />
+            <div style={{ padding: "0 8px", marginBottom: 12 }}>
+              <div style={{ fontSize: 10, color: c.text3, lineHeight: 1.6 }}>
+                Built by
+                <br />
+                <span style={{ fontWeight: 600, color: c.text2 }}>
+                  Muhammad Musawar Ali Shah
+                </span>
+                <br />
+                <span style={{ fontWeight: 600, color: c.text2 }}>
+                  & Ahmed Asim
+                </span>
+              </div>
+            </div>
             <button
               onClick={onLogout}
               style={{
@@ -433,29 +454,30 @@ export default function Layout({
                 width: "100%",
                 padding: "10px 12px",
                 borderRadius: 8,
-                background: "rgba(255,77,77,0.06)",
-                border: "1px solid rgba(255,77,77,0.12)",
-                color: "#ff6b6b",
+                background: "#fdecea",
+                border: "1.5px solid #f5b8b4",
+                color: c.red,
                 fontSize: 13,
                 cursor: "pointer",
                 whiteSpace: "nowrap",
                 transition: tr,
               }}
             >
-              <span>⏻</span> Sign Out
+              ⏻ Sign Out
             </button>
           </div>
         </div>
       </aside>
 
-      {/* ── Main content ── */}
+      {/* ── Main ── */}
       <main
         style={{
-          marginTop: 56,
-          marginLeft: !isMobile && sidebarOpen ? 240 : 0,
+          marginTop: 60,
+          marginLeft: !mobile && open ? 248 : 0,
           transition: "margin-left 0.25s cubic-bezier(0.4,0,0.2,1)",
-          minHeight: "calc(100vh - 56px)",
+          minHeight: "calc(100vh - 60px)",
           padding: "32px 28px 56px",
+          background: c.skyLight,
         }}
       >
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>{children}</div>
