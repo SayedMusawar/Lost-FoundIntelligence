@@ -1,77 +1,78 @@
 export const c = {
-  bg: "#080b12",
-  bg2: "#0e1220",
-  bg3: "#131929",
-  surface: "#181f30",
-  surface2: "#1e2840",
-  border: "rgba(255,255,255,0.06)",
-  border2: "rgba(255,255,255,0.10)",
-  teal: "#00e5b0",
-  teal2: "#00c49a",
-  tealGlow: "rgba(0,229,176,0.15)",
-  amber: "#f5a623",
-  red: "#ff4d4d",
-  green: "#00d68f",
-  blue: "#4d9fff",
-  text: "#eef0f8",
-  text2: "#7d8aaa",
-  text3: "#404d6a",
+  white: "#fafafa",
+  sky: "#bde3f7",
+  blue: "#1178c2",
+  dark: "#1e2530",
+  blueLight: "#e8f4fd",
+  blueMid: "#4a9fd4",
+  blueDark: "#0d5f9e",
+  blueXDark: "#0a4a7a",
+  skyLight: "#f0f8fe",
+  text: "#1e2530",
+  text2: "#4a5568",
+  text3: "#8a97aa",
+  border: "#d8eaf6",
+  border2: "#b8d8f0",
+  surface: "#ffffff",
+  surface2: "#f0f8fe",
+  surface3: "#e8f4fd",
+  green: "#0ea96a",
+  greenBg: "#e6f9f0",
+  amber: "#e07c00",
+  amberBg: "#fff4e0",
+  red: "#d93025",
+  redBg: "#fdecea",
   fh: "'Syne', sans-serif",
   fb: "'Inter', sans-serif",
 };
 
 export const tr = "all 0.2s cubic-bezier(0.4,0,0.2,1)";
 
-// Reusable style blocks
 export const g = {
-  // Form field wrapper
   field: { marginBottom: 18 },
 
-  // Label
   label: {
     display: "block",
     fontSize: 11,
     fontWeight: 600,
-    color: "#7d8aaa",
-    letterSpacing: "0.8px",
+    color: "#4a5568",
+    letterSpacing: "0.7px",
     textTransform: "uppercase",
     marginBottom: 7,
   },
 
-  // Input / Select
   input: {
     width: "100%",
     padding: "11px 14px",
-    background: "#131929",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1.5px solid #d8eaf6",
     borderRadius: 8,
     fontSize: 14,
-    color: "#eef0f8",
+    color: "#1e2530",
     transition: tr,
     boxSizing: "border-box",
   },
 
-  // Textarea
   textarea: {
     width: "100%",
     padding: "11px 14px",
-    background: "#131929",
-    border: "1px solid rgba(255,255,255,0.08)",
+    background: "#ffffff",
+    border: "1.5px solid #d8eaf6",
     borderRadius: 8,
     fontSize: 14,
-    color: "#eef0f8",
+    color: "#1e2530",
     minHeight: 110,
     resize: "vertical",
     boxSizing: "border-box",
     fontFamily: "'Inter', sans-serif",
+    transition: tr,
   },
 
-  // Primary button
   btnPrimary: {
     width: "100%",
     padding: "13px",
-    background: "#00e5b0",
-    color: "#080b12",
+    background: "#1178c2",
+    color: "#ffffff",
     border: "none",
     borderRadius: 8,
     fontSize: 14,
@@ -79,49 +80,47 @@ export const g = {
     letterSpacing: "0.3px",
     cursor: "pointer",
     transition: tr,
+    fontFamily: "'Syne', sans-serif",
+    boxShadow: "0 4px 16px rgba(17,120,194,0.30)",
   },
 
-  // Card
   card: {
-    background: "#181f30",
-    border: "1px solid rgba(255,255,255,0.06)",
+    background: "#ffffff",
+    border: "1.5px solid #e8f4fd",
     borderRadius: 12,
     padding: "22px 24px",
+    boxShadow: "0 2px 12px rgba(17,120,194,0.07)",
   },
 
-  // Section heading
   sectionHead: {
     fontSize: 11,
     fontWeight: 600,
-    color: "#404d6a",
+    color: "#8a97aa",
     letterSpacing: "1.2px",
     textTransform: "uppercase",
     marginBottom: 14,
   },
 
-  // Page title
   pageTitle: {
     fontFamily: "'Syne', sans-serif",
     fontSize: 24,
     fontWeight: 700,
-    color: "#eef0f8",
+    color: "#1e2530",
     letterSpacing: "-0.3px",
   },
 
   pageSub: {
     fontSize: 13,
-    color: "#7d8aaa",
+    color: "#8a97aa",
     marginTop: 5,
   },
 
-  // Divider
   divider: {
     height: 1,
-    background: "rgba(255,255,255,0.06)",
+    background: "#e8f4fd",
     margin: "20px 0",
   },
 
-  // Badge
   badge: (bg, color) => ({
     display: "inline-flex",
     alignItems: "center",
@@ -135,30 +134,17 @@ export const g = {
     whiteSpace: "nowrap",
   }),
 
-  // Toast alert
   alert: (type) => {
     const map = {
-      success: {
-        bg: "rgba(0,214,143,0.12)",
-        border: "rgba(0,214,143,0.25)",
-        color: "#00d68f",
-      },
-      error: {
-        bg: "rgba(255,77,77,0.12)",
-        border: "rgba(255,77,77,0.25)",
-        color: "#ff6b6b",
-      },
-      warn: {
-        bg: "rgba(245,166,35,0.12)",
-        border: "rgba(245,166,35,0.25)",
-        color: "#f5a623",
-      },
+      success: { bg: "#e6f9f0", border: "#9fe8c8", color: "#0a7a4a" },
+      error: { bg: "#fdecea", border: "#f5b8b4", color: "#c0251a" },
+      warn: { bg: "#fff4e0", border: "#f5d08a", color: "#a05800" },
     };
     const m = map[type] || map.success;
     return {
       padding: "12px 16px",
       background: m.bg,
-      border: `1px solid ${m.border}`,
+      border: `1.5px solid ${m.border}`,
       borderRadius: 8,
       fontSize: 13,
       color: m.color,
@@ -169,53 +155,40 @@ export const g = {
     };
   },
 
-  // Empty state
-  empty: {
-    textAlign: "center",
-    padding: "80px 24px",
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-    display: "block",
-    opacity: 0.6,
-  },
+  empty: { textAlign: "center", padding: "80px 24px" },
+  emptyIcon: { fontSize: 48, marginBottom: 16, display: "block", opacity: 0.5 },
   emptyTitle: {
     fontSize: 17,
     fontWeight: 600,
-    color: "#eef0f8",
+    color: "#1e2530",
     fontFamily: "'Syne', sans-serif",
     marginBottom: 8,
   },
-  emptySub: {
-    fontSize: 13,
-    color: "#7d8aaa",
-  },
+  emptySub: { fontSize: 13, color: "#8a97aa" },
 
-  // Stats row
   statsRow: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-    gap: 12,
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px,1fr))",
+    gap: 14,
     marginBottom: 28,
   },
-  statCard: (accentColor) => ({
-    background: "#181f30",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 10,
-    padding: "16px 18px",
-    borderTop: `2px solid ${accentColor}`,
+
+  statCard: (accent) => ({
+    background: "#ffffff",
+    border: "1.5px solid #e8f4fd",
+    borderRadius: 12,
+    padding: "18px 20px",
+    borderTop: `3px solid ${accent}`,
+    boxShadow: "0 2px 12px rgba(17,120,194,0.07)",
   }),
+
   statVal: {
     fontFamily: "'Syne', sans-serif",
-    fontSize: 28,
-    fontWeight: 700,
-    color: "#eef0f8",
+    fontSize: 30,
+    fontWeight: 800,
+    color: "#1e2530",
     lineHeight: 1,
     marginBottom: 6,
   },
-  statLbl: {
-    fontSize: 11,
-    color: "#7d8aaa",
-  },
+  statLbl: { fontSize: 12, color: "#8a97aa" },
 };

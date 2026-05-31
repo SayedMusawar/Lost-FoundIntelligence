@@ -1,4 +1,3 @@
-/* reset all vite defaults */
 body {
   margin: 0;
 }
@@ -8,15 +7,14 @@ body {
   margin: 0;
   text-align: left;
   border: none;
+  min-height: 100vh;
 }
 h1,
 h2,
 h3,
 h4,
 h5,
-h6 {
-  margin: 0;
-}
+h6,
 p {
   margin: 0;
 }
