@@ -64,6 +64,7 @@ export default function IssueReceipt({ user, onBack }) {
     color: c.text,
     transition: tr,
     boxSizing: "border-box",
+    fontFamily: c.fb,
   };
 
   if (receipt)
@@ -77,7 +78,7 @@ export default function IssueReceipt({ user, onBack }) {
             color: c.text3,
             fontSize: 13,
             cursor: "pointer",
-            padding: "0 0 16px",
+            padding: "0 0 14px",
             display: "flex",
             alignItems: "center",
             gap: 6,
@@ -88,15 +89,15 @@ export default function IssueReceipt({ user, onBack }) {
         <h1
           style={{
             fontFamily: c.fh,
-            fontSize: 26,
+            fontSize: 24,
             fontWeight: 700,
             color: c.dark,
-            marginBottom: 6,
+            marginBottom: 5,
           }}
         >
           Receipt Issued
         </h1>
-        <p style={{ fontSize: 13, color: c.green, marginBottom: 28 }}>
+        <p style={{ fontSize: 13, color: c.green, marginBottom: 24 }}>
           ✓ Item handover confirmed
         </p>
         <div style={{ maxWidth: 520 }}>
@@ -104,16 +105,16 @@ export default function IssueReceipt({ user, onBack }) {
             style={{
               ...g.card,
               borderRadius: 16,
-              border: `1.5px solid #9fe8c8`,
+              border: "1.5px solid #9fe8c8",
               background: c.greenBg,
             }}
           >
             <div
               style={{
                 textAlign: "center",
-                paddingBottom: 20,
+                paddingBottom: 18,
                 borderBottom: `1px solid #9fe8c8`,
-                marginBottom: 20,
+                marginBottom: 18,
               }}
             >
               <div
@@ -174,14 +175,14 @@ export default function IssueReceipt({ user, onBack }) {
                 ],
               },
             ].map(({ label, rows }) => (
-              <div key={label} style={{ marginBottom: 18 }}>
+              <div key={label} style={{ marginBottom: 16 }}>
                 <div
                   style={{
                     fontSize: 10,
                     color: c.text3,
                     textTransform: "uppercase",
                     letterSpacing: "1px",
-                    marginBottom: 8,
+                    marginBottom: 7,
                   }}
                 >
                   {label}
@@ -203,7 +204,7 @@ export default function IssueReceipt({ user, onBack }) {
                         color: c.dark,
                         fontWeight: 600,
                         textAlign: "right",
-                        maxWidth: 260,
+                        maxWidth: "60%",
                       }}
                     >
                       {v}
@@ -218,7 +219,7 @@ export default function IssueReceipt({ user, onBack }) {
                 fontSize: 11,
                 color: c.text3,
                 lineHeight: 1.7,
-                paddingTop: 16,
+                paddingTop: 14,
                 borderTop: `1px solid ${c.border}`,
               }}
             >
@@ -227,7 +228,7 @@ export default function IssueReceipt({ user, onBack }) {
               FAST-NUCES Peshawar — Student Affairs Office
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+          <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
             <button
               onClick={() => window.print()}
               style={{
@@ -266,277 +267,283 @@ export default function IssueReceipt({ user, onBack }) {
     );
 
   return (
-    <div className="fade-up">
-      <button
-        onClick={onBack}
-        style={{
-          background: "transparent",
-          border: "none",
-          color: c.text3,
-          fontSize: 13,
-          cursor: "pointer",
-          padding: "0 0 14px",
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-        }}
-      >
-        ← Back to Dashboard
-      </button>
-      <div style={{ marginBottom: 28 }}>
-        <h1
+    <>
+      <style>{`
+        .receipt-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+        @media (max-width: 860px) { .receipt-layout { grid-template-columns: 1fr; } .receipt-preview { display: none; } }
+      `}</style>
+      <div className="fade-up">
+        <button
+          onClick={onBack}
           style={{
-            fontFamily: c.fh,
-            fontSize: 26,
-            fontWeight: 700,
-            color: c.dark,
-            marginBottom: 6,
+            background: "transparent",
+            border: "none",
+            color: c.text3,
+            fontSize: 13,
+            cursor: "pointer",
+            padding: "0 0 14px",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          Issue Receipt
-        </h1>
-        <p style={{ fontSize: 13, color: c.text3 }}>
-          Issue handover receipts for approved claims
-        </p>
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 360px",
-          gap: 20,
-          alignItems: "start",
-        }}
-      >
-        <div>
-          <div style={g.sectionHead}>Awaiting Receipt ({approved.length})</div>
-          {approved.length === 0 && (
-            <div style={g.empty}>
-              <span style={g.emptyIcon}>✅</span>
-              <p style={g.emptyTitle}>All receipts issued</p>
-              <p style={g.emptySub}>No approved claims pending receipt.</p>
-            </div>
-          )}
-          <div
+          ← Back to Dashboard
+        </button>
+        <div style={{ marginBottom: 24 }}>
+          <h1
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              marginBottom: 20,
+              fontFamily: c.fh,
+              fontSize: 24,
+              fontWeight: 700,
+              color: c.dark,
+              marginBottom: 5,
             }}
           >
-            {approved.map((claim) => (
-              <div
-                key={claim.claim_id}
-                style={{
-                  ...g.card,
-                  padding: "14px 18px",
-                  borderRadius: 10,
-                  border:
-                    selected?.claim_id === claim.claim_id
-                      ? `1.5px solid ${c.blue}`
-                      : `1.5px solid ${c.border}`,
-                  background:
-                    selected?.claim_id === claim.claim_id
-                      ? c.blueLight
-                      : "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 12,
-                }}
-              >
-                <div>
+            Issue Receipt
+          </h1>
+          <p style={{ fontSize: 13, color: c.text3 }}>
+            Issue handover receipts for approved claims
+          </p>
+        </div>
+        <div className="receipt-layout">
+          <div>
+            <div style={g.sectionHead}>
+              Awaiting Receipt ({approved.length})
+            </div>
+            {approved.length === 0 && (
+              <div style={g.empty}>
+                <span style={g.emptyIcon}>✅</span>
+                <p style={g.emptyTitle}>All receipts issued</p>
+                <p style={g.emptySub}>No approved claims pending receipt.</p>
+              </div>
+            )}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                marginBottom: 18,
+              }}
+            >
+              {approved.map((claim) => (
+                <div
+                  key={claim.claim_id}
+                  style={{
+                    ...g.card,
+                    padding: "14px 16px",
+                    borderRadius: 10,
+                    border:
+                      selected?.claim_id === claim.claim_id
+                        ? `1.5px solid ${c.blue}`
+                        : `1.5px solid ${c.border}`,
+                    background:
+                      selected?.claim_id === claim.claim_id
+                        ? c.blueLight
+                        : "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontFamily: c.fh,
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: c.dark,
+                        marginBottom: 3,
+                      }}
+                    >
+                      {claim.title}
+                    </div>
+                    <div style={{ fontSize: 11, color: c.text3 }}>
+                      {claim.claimant_name} · {claim.roll_number || "—"} · 📍{" "}
+                      {claim.location_found}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => select(claim)}
+                    style={{
+                      padding: "7px 14px",
+                      background: c.blueLight,
+                      border: `1.5px solid ${c.border2}`,
+                      borderRadius: 7,
+                      color: c.blue,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Issue →
+                  </button>
+                </div>
+              ))}
+            </div>
+            {selected && (
+              <div style={{ ...g.card, borderRadius: 14 }}>
+                <div style={{ marginBottom: 16 }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      color: c.text3,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.8px",
+                      marginBottom: 5,
+                    }}
+                  >
+                    Issuing for
+                  </div>
                   <div
                     style={{
                       fontFamily: c.fh,
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: 700,
                       color: c.dark,
-                      marginBottom: 3,
                     }}
                   >
-                    {claim.title}
+                    {selected.title}
                   </div>
-                  <div style={{ fontSize: 11, color: c.text3 }}>
-                    {claim.claimant_name} · {claim.roll_number || "—"} · 📍{" "}
-                    {claim.location_found}
+                  <div style={{ fontSize: 12, color: c.text2 }}>
+                    {selected.claimant_name}
                   </div>
                 </div>
-                <button
-                  onClick={() => select(claim)}
-                  style={{
-                    padding: "7px 14px",
-                    background: c.blueLight,
-                    border: `1.5px solid ${c.border2}`,
-                    borderRadius: 7,
-                    color: c.blue,
-                    fontSize: 12,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Issue →
-                </button>
-              </div>
-            ))}
-          </div>
-          {selected && (
-            <div style={{ ...g.card, borderRadius: 14 }}>
-              <div style={{ marginBottom: 18 }}>
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: c.text3,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.8px",
-                    marginBottom: 6,
-                  }}
-                >
-                  Issuing for
-                </div>
-                <div
-                  style={{
-                    fontFamily: c.fh,
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: c.dark,
-                  }}
-                >
-                  {selected.title}
-                </div>
-                <div style={{ fontSize: 12, color: c.text2 }}>
-                  {selected.claimant_name}
-                </div>
-              </div>
-              {[
-                { lbl: "Receiver Name", key: "receiver_name", ph: "Full name" },
-                {
-                  lbl: "Phone Number",
-                  key: "receiver_phone",
-                  ph: "03XX-XXXXXXX",
-                },
-                {
-                  lbl: "Item Condition",
-                  key: "condition_at_handover",
-                  ph: "e.g. Good, minor scratches",
-                },
-              ].map(({ lbl, key, ph }) => (
-                <div key={key} style={g.field}>
-                  <label style={g.label}>{lbl}</label>
-                  <input
-                    style={inp}
-                    placeholder={ph}
-                    value={form[key]}
+                {[
+                  {
+                    lbl: "Receiver Name",
+                    key: "receiver_name",
+                    ph: "Full name",
+                  },
+                  {
+                    lbl: "Phone Number",
+                    key: "receiver_phone",
+                    ph: "03XX-XXXXXXX",
+                  },
+                  {
+                    lbl: "Item Condition",
+                    key: "condition_at_handover",
+                    ph: "e.g. Good, minor scratches",
+                  },
+                ].map(({ lbl, key, ph }) => (
+                  <div key={key} style={g.field}>
+                    <label style={g.label}>{lbl}</label>
+                    <input
+                      style={inp}
+                      placeholder={ph}
+                      value={form[key]}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, [key]: e.target.value }))
+                      }
+                    />
+                  </div>
+                ))}
+                <div style={g.field}>
+                  <label style={g.label}>Notes (optional)</label>
+                  <textarea
+                    style={{
+                      ...g.textarea,
+                      minHeight: 70,
+                      background: c.surface2,
+                    }}
+                    placeholder="Additional notes…"
+                    value={form.notes}
                     onChange={(e) =>
-                      setForm((f) => ({ ...f, [key]: e.target.value }))
+                      setForm((f) => ({ ...f, notes: e.target.value }))
                     }
                   />
                 </div>
-              ))}
-              <div style={g.field}>
-                <label style={g.label}>Notes (optional)</label>
-                <textarea
-                  style={{
-                    ...g.textarea,
-                    minHeight: 70,
-                    background: c.surface2,
-                  }}
-                  placeholder="Additional notes…"
-                  value={form.notes}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, notes: e.target.value }))
-                  }
-                />
+                {error && <div style={g.alert("error")}>⚠ {error}</div>}
+                <div style={g.divider} />
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button
+                    onClick={() => setSelected(null)}
+                    style={{
+                      flex: 1,
+                      padding: "11px",
+                      background: "#fff",
+                      border: `1.5px solid ${c.border}`,
+                      borderRadius: 8,
+                      fontSize: 13,
+                      color: c.text2,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={issue}
+                    disabled={loading}
+                    style={{
+                      flex: 2,
+                      padding: "11px",
+                      background: `linear-gradient(135deg,${c.blue},${c.blueDark})`,
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      fontFamily: c.fh,
+                      opacity: loading ? 0.65 : 1,
+                    }}
+                  >
+                    {loading ? "Issuing…" : "✓ Issue Receipt"}
+                  </button>
+                </div>
               </div>
-              {error && <div style={g.alert("error")}>⚠ {error}</div>}
-              <div style={g.divider} />
-              <div style={{ display: "flex", gap: 10 }}>
-                <button
-                  onClick={() => setSelected(null)}
-                  style={{
-                    flex: 1,
-                    padding: "11px",
-                    background: "#fff",
-                    border: `1.5px solid ${c.border}`,
-                    borderRadius: 8,
-                    fontSize: 13,
-                    color: c.text2,
-                    cursor: "pointer",
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={issue}
-                  disabled={loading}
-                  style={{
-                    flex: 2,
-                    padding: "11px",
-                    background: `linear-gradient(135deg,${c.blue},${c.blueDark})`,
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 8,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: c.fh,
-                    opacity: loading ? 0.65 : 1,
-                  }}
-                >
-                  {loading ? "Issuing…" : "✓ Issue Receipt"}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        <div>
-          <div style={g.sectionHead}>Receipt Preview</div>
-          <div
-            style={{
-              ...g.card,
-              borderRadius: 14,
-              opacity: selected ? 1 : 0.45,
-            }}
-          >
+            )}
+          </div>
+
+          {/* Preview (hidden on mobile) */}
+          <div className="receipt-preview">
+            <div style={g.sectionHead}>Receipt Preview</div>
             <div
               style={{
-                textAlign: "center",
-                paddingBottom: 16,
-                borderBottom: `1px solid ${c.border}`,
-                marginBottom: 16,
+                ...g.card,
+                borderRadius: 14,
+                opacity: selected ? 1 : 0.45,
               }}
             >
               <div
                 style={{
-                  fontFamily: c.fh,
-                  fontSize: 13,
-                  fontWeight: 800,
-                  color: c.dark,
-                  marginBottom: 3,
+                  textAlign: "center",
+                  paddingBottom: 14,
+                  borderBottom: `1px solid ${c.border}`,
+                  marginBottom: 14,
                 }}
               >
-                FAST-NUCES Peshawar
+                <div
+                  style={{
+                    fontFamily: c.fh,
+                    fontSize: 13,
+                    fontWeight: 800,
+                    color: c.dark,
+                    marginBottom: 3,
+                  }}
+                >
+                  FAST-NUCES Peshawar
+                </div>
+                <div style={{ fontSize: 10, color: c.text3, marginBottom: 7 }}>
+                  Item Handover Receipt
+                </div>
+                <span
+                  style={{
+                    padding: "2px 10px",
+                    borderRadius: 99,
+                    background: c.blueLight,
+                    color: c.blue,
+                    fontSize: 9,
+                    fontWeight: 700,
+                  }}
+                >
+                  {selected ? `Claim #${selected.claim_id}` : "Select a claim"}
+                </span>
               </div>
-              <div style={{ fontSize: 10, color: c.text3, marginBottom: 8 }}>
-                Item Handover Receipt
-              </div>
-              <span
-                style={{
-                  padding: "2px 10px",
-                  borderRadius: 99,
-                  background: c.blueLight,
-                  color: c.blue,
-                  fontSize: 9,
-                  fontWeight: 700,
-                }}
-              >
-                {selected ? `Claim #${selected.claim_id}` : "Select a claim"}
-              </span>
-            </div>
-            {selected ? (
-              <>
-                {[
+              {selected ? (
+                [
                   ["Item", selected.title],
                   ["Claimant", form.receiver_name || selected.claimant_name],
                   ["Phone", form.receiver_phone || "—"],
@@ -556,36 +563,36 @@ export default function IssueReceipt({ user, onBack }) {
                     <span style={{ color: c.text2 }}>{k}</span>
                     <span style={{ color: c.dark, fontWeight: 600 }}>{v}</span>
                   </div>
-                ))}
-              </>
-            ) : (
-              <p
+                ))
+              ) : (
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontSize: 12,
+                    color: c.text3,
+                    padding: "20px 0",
+                  }}
+                >
+                  Select a claim to preview
+                </p>
+              )}
+              <div
                 style={{
                   textAlign: "center",
-                  fontSize: 12,
+                  fontSize: 10,
                   color: c.text3,
-                  padding: "20px 0",
+                  paddingTop: 12,
+                  borderTop: `1px solid ${c.border}`,
+                  marginTop: 14,
+                  lineHeight: 1.6,
                 }}
               >
-                Select a claim to preview
-              </p>
-            )}
-            <div
-              style={{
-                textAlign: "center",
-                fontSize: 10,
-                color: c.text3,
-                paddingTop: 12,
-                borderTop: `1px solid ${c.border}`,
-                marginTop: 14,
-                lineHeight: 1.6,
-              }}
-            >
-              FAST-NUCES Peshawar — Student Affairs Office
+                FAST-NUCES Peshawar — Student Affairs Office
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
