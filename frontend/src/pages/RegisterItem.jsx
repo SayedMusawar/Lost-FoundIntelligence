@@ -32,7 +32,7 @@ const LOCATIONS = [
 ];
 
 export default function RegisterItem({ user }) {
-  const [categories, setCategories] = useState([]);
+  const [cats, setCats] = useState([]);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -46,13 +46,13 @@ export default function RegisterItem({ user }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getCategories().then((r) => setCategories(r.data));
+    getCategories().then((r) => setCats(r.data));
   }, []);
 
   const set = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async () => {
+  const submit = async () => {
     if (
       !form.title ||
       !form.description ||
@@ -91,7 +91,7 @@ export default function RegisterItem({ user }) {
         location_other: "",
         found_at: "",
       });
-      setTimeout(() => setSuccess(false), 4000);
+      setTimeout(() => setSuccess(false), 5000);
     } catch {
       setError("Failed to register item. Please try again.");
     } finally {
@@ -102,8 +102,8 @@ export default function RegisterItem({ user }) {
   const inp = {
     width: "100%",
     padding: "11px 14px",
-    background: c.bg3,
-    border: `1px solid ${c.border}`,
+    background: "#fff",
+    border: `1.5px solid ${c.border}`,
     borderRadius: 8,
     fontSize: 14,
     color: c.text,
@@ -119,23 +119,22 @@ export default function RegisterItem({ user }) {
             fontFamily: c.fh,
             fontSize: 26,
             fontWeight: 700,
-            color: c.text,
+            color: c.dark,
             marginBottom: 6,
           }}
         >
           Register Found Item
         </h1>
-        <p style={{ fontSize: 13, color: c.text2 }}>
-          Record an item found on campus —{" "}
-          <span style={{ color: c.teal }}>{user.name}</span>
+        <p style={{ fontSize: 13, color: c.text3 }}>
+          Record a found item — logged by{" "}
+          <span style={{ color: c.blue, fontWeight: 600 }}>{user.name}</span>
         </p>
       </div>
-
       <div style={{ maxWidth: 600 }}>
         <div style={{ ...g.card, borderRadius: 16 }}>
           {success && (
             <div style={{ ...g.alert("success"), marginBottom: 24 }}>
-              ✓ Item registered successfully!
+              ✓ Item registered successfully! You may register another below.
             </div>
           )}
           {error && (
@@ -154,7 +153,6 @@ export default function RegisterItem({ user }) {
               onChange={set}
             />
           </div>
-
           <div style={g.field}>
             <label style={g.label}>Description *</label>
             <textarea
@@ -165,7 +163,6 @@ export default function RegisterItem({ user }) {
               onChange={set}
             />
           </div>
-
           <div
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
           >
@@ -178,7 +175,7 @@ export default function RegisterItem({ user }) {
                 onChange={set}
               >
                 <option value="">— Select —</option>
-                {categories.map((cat) => (
+                {cats.map((cat) => (
                   <option key={cat.category_id} value={cat.category_id}>
                     {cat.cat_name}
                   </option>
@@ -202,7 +199,6 @@ export default function RegisterItem({ user }) {
               </select>
             </div>
           </div>
-
           {form.location_found === "Other" && (
             <div style={g.field}>
               <label style={g.label}>Specific Location *</label>
@@ -215,7 +211,6 @@ export default function RegisterItem({ user }) {
               />
             </div>
           )}
-
           <div style={g.field}>
             <label style={g.label}>Date & Time Found *</label>
             <input
@@ -226,18 +221,11 @@ export default function RegisterItem({ user }) {
               onChange={set}
             />
           </div>
-
           <div style={g.divider} />
-
           <button
-            onClick={handleSubmit}
+            onClick={submit}
             disabled={loading}
-            style={{
-              ...g.btnPrimary,
-              opacity: loading ? 0.6 : 1,
-              boxShadow: loading ? "none" : `0 0 24px rgba(0,229,176,0.2)`,
-              fontFamily: c.fh,
-            }}
+            style={{ ...g.btnPrimary, opacity: loading ? 0.65 : 1 }}
           >
             {loading ? "Registering…" : "Register Item →"}
           </button>

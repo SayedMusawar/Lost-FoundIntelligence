@@ -19,7 +19,7 @@ export default function IssueReceipt({ user, onBack }) {
     getApprovedNoReceipt().then((r) => setApproved(r.data));
   }, []);
 
-  const handleSelect = (claim) => {
+  const select = (claim) => {
     setSelected(claim);
     setForm({
       receiver_name: claim.claimant_name,
@@ -31,7 +31,7 @@ export default function IssueReceipt({ user, onBack }) {
     setError("");
   };
 
-  const handleIssue = async () => {
+  const issue = async () => {
     if (!form.receiver_name || !form.receiver_phone) {
       setError("Receiver name and phone are required.");
       return;
@@ -56,9 +56,9 @@ export default function IssueReceipt({ user, onBack }) {
 
   const inp = {
     width: "100%",
-    padding: "11px 14px",
-    background: c.bg3,
-    border: `1px solid ${c.border}`,
+    padding: "10px 14px",
+    background: c.surface2,
+    border: `1.5px solid ${c.border}`,
     borderRadius: 8,
     fontSize: 13,
     color: c.text,
@@ -66,57 +66,53 @@ export default function IssueReceipt({ user, onBack }) {
     boxSizing: "border-box",
   };
 
-  // Receipt printed view
   if (receipt)
     return (
       <div className="fade-up">
-        <div style={{ marginBottom: 24 }}>
-          <button
-            onClick={onBack}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: c.text2,
-              fontSize: 13,
-              cursor: "pointer",
-              padding: "0 0 16px",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            ← Back to Dashboard
-          </button>
-          <h1
-            style={{
-              fontFamily: c.fh,
-              fontSize: 26,
-              fontWeight: 700,
-              color: c.text,
-              marginBottom: 6,
-            }}
-          >
-            Receipt Issued
-          </h1>
-          <p style={{ fontSize: 13, color: c.green }}>
-            ✓ Item handover confirmed
-          </p>
-        </div>
+        <button
+          onClick={onBack}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: c.text3,
+            fontSize: 13,
+            cursor: "pointer",
+            padding: "0 0 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          ← Back to Dashboard
+        </button>
+        <h1
+          style={{
+            fontFamily: c.fh,
+            fontSize: 26,
+            fontWeight: 700,
+            color: c.dark,
+            marginBottom: 6,
+          }}
+        >
+          Receipt Issued
+        </h1>
+        <p style={{ fontSize: 13, color: c.green, marginBottom: 28 }}>
+          ✓ Item handover confirmed
+        </p>
         <div style={{ maxWidth: 520 }}>
           <div
             style={{
               ...g.card,
               borderRadius: 16,
-              border: `1px solid rgba(0,229,176,0.2)`,
-              background: "rgba(0,229,176,0.04)",
+              border: `1.5px solid #9fe8c8`,
+              background: c.greenBg,
             }}
           >
-            {/* Receipt header */}
             <div
               style={{
                 textAlign: "center",
                 paddingBottom: 20,
-                borderBottom: `1px solid ${c.border}`,
+                borderBottom: `1px solid #9fe8c8`,
                 marginBottom: 20,
               }}
             >
@@ -124,8 +120,8 @@ export default function IssueReceipt({ user, onBack }) {
                 style={{
                   fontFamily: c.fh,
                   fontSize: 15,
-                  fontWeight: 700,
-                  color: c.text,
+                  fontWeight: 800,
+                  color: c.dark,
                   marginBottom: 4,
                 }}
               >
@@ -138,16 +134,15 @@ export default function IssueReceipt({ user, onBack }) {
                 style={{
                   padding: "3px 12px",
                   borderRadius: 99,
-                  background: "rgba(0,229,176,0.12)",
-                  color: c.teal,
+                  background: c.blueLight,
+                  color: c.blue,
                   fontSize: 10,
-                  fontWeight: 600,
+                  fontWeight: 700,
                 }}
               >
                 Receipt #{receipt.receipt_id}
               </span>
             </div>
-
             {[
               {
                 label: "Item Details",
@@ -205,8 +200,8 @@ export default function IssueReceipt({ user, onBack }) {
                     <span style={{ color: c.text2 }}>{k}</span>
                     <span
                       style={{
-                        color: c.text,
-                        fontWeight: 500,
+                        color: c.dark,
+                        fontWeight: 600,
                         textAlign: "right",
                         maxWidth: 260,
                       }}
@@ -217,7 +212,6 @@ export default function IssueReceipt({ user, onBack }) {
                 ))}
               </div>
             ))}
-
             <div
               style={{
                 textAlign: "center",
@@ -239,8 +233,8 @@ export default function IssueReceipt({ user, onBack }) {
               style={{
                 flex: 2,
                 padding: "12px",
-                background: c.teal,
-                color: c.bg,
+                background: `linear-gradient(135deg,${c.blue},${c.blueDark})`,
+                color: "#fff",
                 border: "none",
                 borderRadius: 8,
                 fontSize: 13,
@@ -256,8 +250,8 @@ export default function IssueReceipt({ user, onBack }) {
               style={{
                 flex: 1,
                 padding: "12px",
-                background: c.surface,
-                border: `1px solid ${c.border}`,
+                background: "#fff",
+                border: `1.5px solid ${c.border}`,
                 borderRadius: 8,
                 fontSize: 13,
                 color: c.text2,
@@ -273,62 +267,48 @@ export default function IssueReceipt({ user, onBack }) {
 
   return (
     <div className="fade-up">
+      <button
+        onClick={onBack}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: c.text3,
+          fontSize: 13,
+          cursor: "pointer",
+          padding: "0 0 14px",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        ← Back to Dashboard
+      </button>
       <div style={{ marginBottom: 28 }}>
-        <button
-          onClick={onBack}
-          style={{
-            background: "transparent",
-            border: "none",
-            color: c.text2,
-            fontSize: 13,
-            cursor: "pointer",
-            padding: "0 0 16px",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          ← Back to Dashboard
-        </button>
         <h1
           style={{
             fontFamily: c.fh,
             fontSize: 26,
             fontWeight: 700,
-            color: c.text,
+            color: c.dark,
             marginBottom: 6,
           }}
         >
           Issue Receipt
         </h1>
-        <p style={{ fontSize: 13, color: c.text2 }}>
+        <p style={{ fontSize: 13, color: c.text3 }}>
           Issue handover receipts for approved claims
         </p>
       </div>
-
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 380px",
+          gridTemplateColumns: "1fr 360px",
           gap: 20,
           alignItems: "start",
         }}
       >
-        {/* Left: claim list + form */}
         <div>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: c.text3,
-              letterSpacing: "1.2px",
-              textTransform: "uppercase",
-              marginBottom: 14,
-            }}
-          >
-            Awaiting Receipt ({approved.length})
-          </div>
-
+          <div style={g.sectionHead}>Awaiting Receipt ({approved.length})</div>
           {approved.length === 0 && (
             <div style={g.empty}>
               <span style={g.emptyIcon}>✅</span>
@@ -336,7 +316,6 @@ export default function IssueReceipt({ user, onBack }) {
               <p style={g.emptySub}>No approved claims pending receipt.</p>
             </div>
           )}
-
           <div
             style={{
               display: "flex",
@@ -354,12 +333,12 @@ export default function IssueReceipt({ user, onBack }) {
                   borderRadius: 10,
                   border:
                     selected?.claim_id === claim.claim_id
-                      ? `1px solid rgba(0,229,176,0.3)`
-                      : `1px solid ${c.border}`,
+                      ? `1.5px solid ${c.blue}`
+                      : `1.5px solid ${c.border}`,
                   background:
                     selected?.claim_id === claim.claim_id
-                      ? "rgba(0,229,176,0.05)"
-                      : c.surface,
+                      ? c.blueLight
+                      : "#fff",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -369,11 +348,11 @@ export default function IssueReceipt({ user, onBack }) {
                 <div>
                   <div
                     style={{
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: c.text,
-                      marginBottom: 3,
                       fontFamily: c.fh,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: c.dark,
+                      marginBottom: 3,
                     }}
                   >
                     {claim.title}
@@ -384,15 +363,15 @@ export default function IssueReceipt({ user, onBack }) {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleSelect(claim)}
+                  onClick={() => select(claim)}
                   style={{
                     padding: "7px 14px",
-                    background: "rgba(0,229,176,0.10)",
-                    border: `1px solid rgba(0,229,176,0.2)`,
+                    background: c.blueLight,
+                    border: `1.5px solid ${c.border2}`,
                     borderRadius: 7,
-                    color: c.teal,
+                    color: c.blue,
                     fontSize: 12,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     cursor: "pointer",
                     whiteSpace: "nowrap",
                   }}
@@ -402,7 +381,6 @@ export default function IssueReceipt({ user, onBack }) {
               </div>
             ))}
           </div>
-
           {selected && (
             <div style={{ ...g.card, borderRadius: 14 }}>
               <div style={{ marginBottom: 18 }}>
@@ -422,7 +400,7 @@ export default function IssueReceipt({ user, onBack }) {
                     fontFamily: c.fh,
                     fontSize: 15,
                     fontWeight: 700,
-                    color: c.text,
+                    color: c.dark,
                   }}
                 >
                   {selected.title}
@@ -431,7 +409,6 @@ export default function IssueReceipt({ user, onBack }) {
                   {selected.claimant_name}
                 </div>
               </div>
-
               {[
                 { lbl: "Receiver Name", key: "receiver_name", ph: "Full name" },
                 {
@@ -457,11 +434,14 @@ export default function IssueReceipt({ user, onBack }) {
                   />
                 </div>
               ))}
-
               <div style={g.field}>
                 <label style={g.label}>Notes (optional)</label>
                 <textarea
-                  style={{ ...g.textarea, minHeight: 70 }}
+                  style={{
+                    ...g.textarea,
+                    minHeight: 70,
+                    background: c.surface2,
+                  }}
                   placeholder="Additional notes…"
                   value={form.notes}
                   onChange={(e) =>
@@ -469,7 +449,6 @@ export default function IssueReceipt({ user, onBack }) {
                   }
                 />
               </div>
-
               {error && <div style={g.alert("error")}>⚠ {error}</div>}
               <div style={g.divider} />
               <div style={{ display: "flex", gap: 10 }}>
@@ -478,8 +457,8 @@ export default function IssueReceipt({ user, onBack }) {
                   style={{
                     flex: 1,
                     padding: "11px",
-                    background: "transparent",
-                    border: `1px solid ${c.border}`,
+                    background: "#fff",
+                    border: `1.5px solid ${c.border}`,
                     borderRadius: 8,
                     fontSize: 13,
                     color: c.text2,
@@ -489,20 +468,20 @@ export default function IssueReceipt({ user, onBack }) {
                   Cancel
                 </button>
                 <button
-                  onClick={handleIssue}
+                  onClick={issue}
                   disabled={loading}
                   style={{
                     flex: 2,
                     padding: "11px",
-                    background: c.teal,
-                    color: c.bg,
+                    background: `linear-gradient(135deg,${c.blue},${c.blueDark})`,
+                    color: "#fff",
                     border: "none",
                     borderRadius: 8,
                     fontSize: 13,
                     fontWeight: 700,
                     cursor: "pointer",
                     fontFamily: c.fh,
-                    opacity: loading ? 0.6 : 1,
+                    opacity: loading ? 0.65 : 1,
                   }}
                 >
                   {loading ? "Issuing…" : "✓ Issue Receipt"}
@@ -511,23 +490,14 @@ export default function IssueReceipt({ user, onBack }) {
             </div>
           )}
         </div>
-
-        {/* Right: live preview */}
         <div>
+          <div style={g.sectionHead}>Receipt Preview</div>
           <div
             style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: c.text3,
-              letterSpacing: "1.2px",
-              textTransform: "uppercase",
-              marginBottom: 14,
+              ...g.card,
+              borderRadius: 14,
+              opacity: selected ? 1 : 0.45,
             }}
-          >
-            Receipt Preview
-          </div>
-          <div
-            style={{ ...g.card, borderRadius: 14, opacity: selected ? 1 : 0.4 }}
           >
             <div
               style={{
@@ -541,8 +511,8 @@ export default function IssueReceipt({ user, onBack }) {
                 style={{
                   fontFamily: c.fh,
                   fontSize: 13,
-                  fontWeight: 700,
-                  color: c.text,
+                  fontWeight: 800,
+                  color: c.dark,
                   marginBottom: 3,
                 }}
               >
@@ -555,9 +525,10 @@ export default function IssueReceipt({ user, onBack }) {
                 style={{
                   padding: "2px 10px",
                   borderRadius: 99,
-                  background: c.bg3,
-                  color: c.text3,
+                  background: c.blueLight,
+                  color: c.blue,
                   fontSize: 9,
+                  fontWeight: 700,
                 }}
               >
                 {selected ? `Claim #${selected.claim_id}` : "Select a claim"}
@@ -583,7 +554,7 @@ export default function IssueReceipt({ user, onBack }) {
                     }}
                   >
                     <span style={{ color: c.text2 }}>{k}</span>
-                    <span style={{ color: c.text, fontWeight: 500 }}>{v}</span>
+                    <span style={{ color: c.dark, fontWeight: 600 }}>{v}</span>
                   </div>
                 ))}
               </>

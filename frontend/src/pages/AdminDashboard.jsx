@@ -7,7 +7,7 @@ export default function AdminDashboard({ user, onReceipt }) {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
 
-  const fetchClaims = async () => {
+  const fetch = async () => {
     setLoading(true);
     const r = await getPendingClaims();
     setClaims(r.data);
@@ -15,17 +15,14 @@ export default function AdminDashboard({ user, onReceipt }) {
   };
 
   useEffect(() => {
-    fetchClaims();
+    fetch();
   }, []);
 
-  const handleReview = async (claimId, action) => {
+  const review = async (id, action) => {
     try {
-      await reviewClaim(claimId, action, user.user_id);
-      setToast({
-        msg: `Claim ${action} — notification sent.`,
-        type: "success",
-      });
-      fetchClaims();
+      await reviewClaim(id, action, user.user_id);
+      setToast({ msg: `Claim ${action} — student notified.`, type: "success" });
+      fetch();
     } catch (err) {
       setToast({
         msg: err.response?.data?.detail || "Action failed.",
@@ -38,7 +35,6 @@ export default function AdminDashboard({ user, onReceipt }) {
 
   return (
     <div className="fade-up">
-      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -55,13 +51,13 @@ export default function AdminDashboard({ user, onReceipt }) {
               fontFamily: c.fh,
               fontSize: 26,
               fontWeight: 700,
-              color: c.text,
+              color: c.dark,
               marginBottom: 6,
             }}
           >
             Admin Dashboard
           </h1>
-          <p style={{ fontSize: 13, color: c.text2 }}>
+          <p style={{ fontSize: 13, color: c.text3 }}>
             Review and manage pending claim requests
           </p>
         </div>
@@ -69,12 +65,12 @@ export default function AdminDashboard({ user, onReceipt }) {
           onClick={onReceipt}
           style={{
             padding: "10px 20px",
-            background: "rgba(0,229,176,0.10)",
-            border: `1px solid rgba(0,229,176,0.22)`,
+            background: c.blueLight,
+            border: `1.5px solid ${c.border2}`,
             borderRadius: 9,
-            color: c.teal,
+            color: c.blue,
             fontSize: 13,
-            fontWeight: 600,
+            fontWeight: 700,
             cursor: "pointer",
             fontFamily: c.fh,
             transition: tr,
@@ -84,24 +80,23 @@ export default function AdminDashboard({ user, onReceipt }) {
         </button>
       </div>
 
-      {/* Stats */}
       <div style={g.statsRow}>
         {[
           {
             val: claims.length,
             lbl: "Pending Claims",
-            accent: claims.length > 0 ? c.amber : c.teal,
+            accent: claims.length > 0 ? c.amber : c.green,
           },
           { val: "—", lbl: "Total Items", accent: c.blue },
           { val: "—", lbl: "Resolved Today", accent: c.green },
-          { val: "—", lbl: "This Month", accent: c.text2 },
+          { val: "—", lbl: "This Month", accent: c.text3 },
         ].map(({ val, lbl, accent }) => (
           <div key={lbl} style={g.statCard(accent)}>
             <div
               style={{
                 ...g.statVal,
                 color:
-                  accent === c.amber && claims.length > 0 ? c.amber : c.text,
+                  accent === c.amber && claims.length > 0 ? c.amber : c.dark,
               }}
             >
               {val}
@@ -111,25 +106,13 @@ export default function AdminDashboard({ user, onReceipt }) {
         ))}
       </div>
 
-      {/* Toast */}
       {toast && (
         <div style={g.alert(toast.type)}>
           {toast.type === "success" ? "✓" : "⚠"} {toast.msg}
         </div>
       )}
 
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 600,
-          color: c.text3,
-          letterSpacing: "1.2px",
-          textTransform: "uppercase",
-          marginBottom: 16,
-        }}
-      >
-        Pending Claims ({claims.length})
-      </div>
+      <div style={g.sectionHead}>Pending Claims ({claims.length})</div>
 
       {loading && (
         <div style={g.empty}>
@@ -137,7 +120,7 @@ export default function AdminDashboard({ user, onReceipt }) {
             style={{
               width: 36,
               height: 36,
-              border: `3px solid ${c.teal}`,
+              border: `3px solid ${c.blue}`,
               borderTopColor: "transparent",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",
@@ -168,7 +151,6 @@ export default function AdminDashboard({ user, onReceipt }) {
                 animationDelay: `${i * 0.05}s`,
               }}
             >
-              {/* Top */}
               <div
                 style={{
                   display: "flex",
@@ -196,7 +178,7 @@ export default function AdminDashboard({ user, onReceipt }) {
                       fontFamily: c.fh,
                       fontSize: 16,
                       fontWeight: 700,
-                      color: c.text,
+                      color: c.dark,
                       marginBottom: 4,
                     }}
                   >
@@ -206,18 +188,15 @@ export default function AdminDashboard({ user, onReceipt }) {
                     📍 {claim.location_found}
                   </p>
                 </div>
-                <span style={g.badge("rgba(245,166,35,0.12)", c.amber)}>
+                <span style={g.badge(c.amberBg, c.amber)}>
                   ⏳ Pending Review
                 </span>
               </div>
-
               <div style={g.divider} />
-
-              {/* Claimant info grid */}
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(160px,1fr))",
                   gap: 12,
                   marginBottom: 16,
                 }}
@@ -243,8 +222,8 @@ export default function AdminDashboard({ user, onReceipt }) {
                     <div
                       style={{
                         fontSize: 13,
-                        color: c.text,
-                        fontWeight: 500,
+                        color: c.dark,
+                        fontWeight: 600,
                         wordBreak: "break-all",
                       }}
                     >
@@ -253,13 +232,11 @@ export default function AdminDashboard({ user, onReceipt }) {
                   </div>
                 ))}
               </div>
-
-              {/* Proof */}
               <div
                 style={{
-                  background: c.bg3,
+                  background: c.surface2,
                   borderRadius: 8,
-                  border: `1px solid ${c.border}`,
+                  border: `1.5px solid ${c.border}`,
                   padding: "12px 16px",
                   marginBottom: 16,
                 }}
@@ -286,16 +263,14 @@ export default function AdminDashboard({ user, onReceipt }) {
                   "{claim.claim_description}"
                 </p>
               </div>
-
-              {/* Actions */}
               <div style={{ display: "flex", gap: 10 }}>
                 <button
-                  onClick={() => handleReview(claim.claim_id, "approved")}
+                  onClick={() => review(claim.claim_id, "approved")}
                   style={{
                     flex: 1,
                     padding: "11px",
-                    background: "rgba(0,214,143,0.12)",
-                    border: `1px solid rgba(0,214,143,0.25)`,
+                    background: c.greenBg,
+                    border: `1.5px solid #9fe8c8`,
                     borderRadius: 8,
                     color: c.green,
                     fontSize: 13,
@@ -308,14 +283,14 @@ export default function AdminDashboard({ user, onReceipt }) {
                   ✓ Approve
                 </button>
                 <button
-                  onClick={() => handleReview(claim.claim_id, "rejected")}
+                  onClick={() => review(claim.claim_id, "rejected")}
                   style={{
                     flex: 1,
                     padding: "11px",
-                    background: "rgba(255,77,77,0.08)",
-                    border: `1px solid rgba(255,77,77,0.2)`,
+                    background: c.redBg,
+                    border: `1.5px solid #f5b8b4`,
                     borderRadius: 8,
-                    color: "#ff6b6b",
+                    color: c.red,
                     fontSize: 13,
                     fontWeight: 700,
                     cursor: "pointer",

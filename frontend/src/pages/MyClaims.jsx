@@ -2,25 +2,15 @@ import { useEffect, useState } from "react";
 import { getMyClaims } from "../api/client";
 import { c, g } from "../theme";
 
-const STATUS_STYLE = {
+const ST = {
   approved: {
-    bg: "rgba(0,214,143,0.12)",
-    color: "#00d68f",
-    border: "rgba(0,214,143,0.25)",
-    dot: "#00d68f",
+    bg: c.greenBg,
+    color: "#0a7a4a",
+    border: "#9fe8c8",
+    dot: "#0ea96a",
   },
-  rejected: {
-    bg: "rgba(255,77,77,0.12)",
-    color: "#ff6b6b",
-    border: "rgba(255,77,77,0.25)",
-    dot: "#ff6b6b",
-  },
-  pending: {
-    bg: "rgba(245,166,35,0.12)",
-    color: "#f5a623",
-    border: "rgba(245,166,35,0.25)",
-    dot: "#f5a623",
-  },
+  rejected: { bg: c.redBg, color: c.red, border: "#f5b8b4", dot: c.red },
+  pending: { bg: c.amberBg, color: c.amber, border: "#f5d08a", dot: c.amber },
 };
 
 export default function MyClaims({ user }) {
@@ -41,7 +31,6 @@ export default function MyClaims({ user }) {
     approved: claims.filter((cl) => cl.status === "approved").length,
     rejected: claims.filter((cl) => cl.status === "rejected").length,
   };
-
   const visible =
     filter === "all" ? claims : claims.filter((cl) => cl.status === filter);
 
@@ -53,22 +42,21 @@ export default function MyClaims({ user }) {
             fontFamily: c.fh,
             fontSize: 26,
             fontWeight: 700,
-            color: c.text,
+            color: c.dark,
             marginBottom: 6,
           }}
         >
           My Claims
         </h1>
-        <p style={{ fontSize: 13, color: c.text2 }}>
+        <p style={{ fontSize: 13, color: c.text3 }}>
           Track all your submitted item claims
         </p>
       </div>
 
-      {/* Stats */}
       {!loading && (
         <div style={g.statsRow}>
           {[
-            { key: "all", val: counts.all, lbl: "Total", accent: c.text2 },
+            { key: "all", val: counts.all, lbl: "Total", accent: c.blue },
             {
               key: "pending",
               val: counts.pending,
@@ -95,16 +83,12 @@ export default function MyClaims({ user }) {
                 ...g.statCard(filter === key ? accent : c.border),
                 cursor: "pointer",
                 transition: "all 0.15s",
-                background:
-                  filter === key
-                    ? `rgba(${accent === c.amber ? "245,166,35" : accent === c.green ? "0,214,143" : accent === c.red ? "255,77,77" : "125,138,170"},0.08)`
-                    : c.surface,
               }}
             >
               <div
                 style={{
                   ...g.statVal,
-                  color: filter === key ? accent : c.text,
+                  color: filter === key ? accent : c.dark,
                 }}
               >
                 {val}
@@ -121,7 +105,7 @@ export default function MyClaims({ user }) {
             style={{
               width: 36,
               height: 36,
-              border: `3px solid ${c.teal}`,
+              border: `3px solid ${c.blue}`,
               borderTopColor: "transparent",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",
@@ -143,22 +127,13 @@ export default function MyClaims({ user }) {
 
       {!loading && visible.length > 0 && (
         <>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: c.text3,
-              letterSpacing: "1.2px",
-              textTransform: "uppercase",
-              marginBottom: 16,
-            }}
-          >
-            {filter === "all" ? "All Claims" : `${filter} Claims`} (
+          <div style={g.sectionHead}>
+            {filter === "all" ? "All Claims" : filter + " Claims"} (
             {visible.length})
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {visible.map((claim, i) => {
-              const sc = STATUS_STYLE[claim.status] || STATUS_STYLE.pending;
+              const sc = ST[claim.status] || ST.pending;
               return (
                 <div
                   key={claim.claim_id}
@@ -166,7 +141,7 @@ export default function MyClaims({ user }) {
                   style={{
                     ...g.card,
                     borderRadius: 14,
-                    borderLeft: `3px solid ${sc.dot}`,
+                    borderLeft: `4px solid ${sc.dot}`,
                     animationDelay: `${i * 0.04}s`,
                   }}
                 >
@@ -197,7 +172,7 @@ export default function MyClaims({ user }) {
                           fontFamily: c.fh,
                           fontSize: 16,
                           fontWeight: 700,
-                          color: c.text,
+                          color: c.dark,
                           marginBottom: 4,
                         }}
                       >
@@ -228,7 +203,7 @@ export default function MyClaims({ user }) {
                         borderRadius: 99,
                         background: sc.bg,
                         color: sc.color,
-                        border: `1px solid ${sc.border}`,
+                        border: `1.5px solid ${sc.border}`,
                         fontSize: 11,
                         fontWeight: 700,
                       }}
@@ -245,14 +220,12 @@ export default function MyClaims({ user }) {
                         claim.status.slice(1)}
                     </span>
                   </div>
-
                   <div style={g.divider} />
-
                   <div
                     style={{
-                      background: c.bg3,
+                      background: c.surface2,
                       borderRadius: 8,
-                      border: `1px solid ${c.border}`,
+                      border: `1.5px solid ${c.border}`,
                       padding: "12px 16px",
                       marginBottom: claim.status !== "pending" ? 14 : 0,
                     }}
@@ -279,7 +252,6 @@ export default function MyClaims({ user }) {
                       "{claim.claim_description}"
                     </p>
                   </div>
-
                   {claim.status === "approved" && (
                     <div
                       style={{

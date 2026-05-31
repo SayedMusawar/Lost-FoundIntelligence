@@ -31,10 +31,10 @@ const LOCATIONS = [
 ];
 
 const STATUS = {
-  found: { bg: "rgba(0,229,176,0.12)", color: "#00e5b0", dot: "#00e5b0" },
-  claimed: { bg: "rgba(77,159,255,0.12)", color: "#4d9fff", dot: "#4d9fff" },
-  closed: { bg: "rgba(125,138,170,0.12)", color: "#7d8aaa", dot: "#7d8aaa" },
-  expired: { bg: "rgba(255,77,77,0.12)", color: "#ff6b6b", dot: "#ff6b6b" },
+  found: { bg: "#e6f9f0", color: "#0a7a4a", dot: "#0ea96a" },
+  claimed: { bg: c.blueLight, color: c.blueDark, dot: c.blue },
+  closed: { bg: "#f0f4f8", color: "#6b7a8a", dot: "#8a97aa" },
+  expired: { bg: "#fdecea", color: c.red, dot: c.red },
 };
 
 export default function ItemList({ user, onClaim }) {
@@ -45,7 +45,7 @@ export default function ItemList({ user, onClaim }) {
   const [location, setLocation] = useState("");
   const [filtered, setFiltered] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState("grid"); // grid | list
+  const [view, setView] = useState("grid");
 
   useEffect(() => {
     Promise.all([getItems(), getCategories()]).then(([ir, cr]) => {
@@ -55,7 +55,7 @@ export default function ItemList({ user, onClaim }) {
     });
   }, []);
 
-  const handleSearch = async () => {
+  const search = async () => {
     setLoading(true);
     const r = await searchItems(keyword, catId || null, location);
     setItems(r.data);
@@ -63,7 +63,7 @@ export default function ItemList({ user, onClaim }) {
     setLoading(false);
   };
 
-  const handleReset = async () => {
+  const reset = async () => {
     setKeyword("");
     setCatId("");
     setLocation("");
@@ -81,12 +81,12 @@ export default function ItemList({ user, onClaim }) {
   ).length;
   const canClaim = ["student", "faculty"].includes(user.role);
 
-  const inputStyle = {
+  const inp = {
     flex: 1,
     minWidth: 120,
     padding: "10px 14px",
-    background: c.bg3,
-    border: `1px solid ${c.border}`,
+    background: "#fff",
+    border: `1.5px solid ${c.border}`,
     borderRadius: 8,
     fontSize: 13,
     color: c.text,
@@ -96,37 +96,36 @@ export default function ItemList({ user, onClaim }) {
 
   return (
     <div className="fade-up">
-      {/* Page header */}
       <div style={{ marginBottom: 28 }}>
         <h1
           style={{
             fontFamily: c.fh,
             fontSize: 26,
             fontWeight: 700,
-            color: c.text,
+            color: c.dark,
             marginBottom: 6,
           }}
         >
-          Lost & Found Items
+          Browse Lost & Found Items
         </h1>
-        <p style={{ fontSize: 13, color: c.text2 }}>
-          Browse items found on campus and submit a claim
+        <p style={{ fontSize: 13, color: c.text3 }}>
+          Items found on campus — submit a claim if something is yours
         </p>
       </div>
 
       {/* Stats */}
       <div style={g.statsRow}>
         {[
-          { val: items.length, lbl: "Total Items", accent: c.teal },
-          { val: claimed, lbl: "Already Claimed", accent: c.blue },
+          { val: items.length, lbl: "Total Items", accent: c.blue },
+          { val: claimed, lbl: "Already Claimed", accent: c.blueMid },
           { val: today, lbl: "Added Today", accent: c.amber },
-          { val: categories.length, lbl: "Categories", accent: c.text2 },
+          { val: categories.length, lbl: "Categories", accent: c.text3 },
         ].map(({ val, lbl, accent }) => (
           <div key={lbl} style={g.statCard(accent)}>
             <div
               style={{
                 ...g.statVal,
-                color: accent === c.teal ? c.teal : c.text,
+                color: accent === c.blue ? c.blue : c.dark,
               }}
             >
               {val}
@@ -139,26 +138,27 @@ export default function ItemList({ user, onClaim }) {
       {/* Filter bar */}
       <div
         style={{
-          background: c.surface,
-          border: `1px solid ${c.border}`,
+          background: "#fff",
+          border: `1.5px solid ${c.border}`,
           borderRadius: 12,
-          padding: "16px 18px",
+          padding: "14px 16px",
           display: "flex",
           flexWrap: "wrap",
           gap: 10,
           alignItems: "center",
           marginBottom: 24,
+          boxShadow: "0 2px 8px rgba(17,120,194,0.06)",
         }}
       >
         <input
-          style={{ ...inputStyle, flex: 2, minWidth: 180 }}
-          placeholder="Search items…"
+          style={{ ...inp, flex: 2, minWidth: 200 }}
+          placeholder="🔍  Search items by title or description…"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          onKeyDown={(e) => e.key === "Enter" && search()}
         />
         <select
-          style={{ ...inputStyle }}
+          style={inp}
           value={catId}
           onChange={(e) => setCatId(e.target.value)}
         >
@@ -170,7 +170,7 @@ export default function ItemList({ user, onClaim }) {
           ))}
         </select>
         <select
-          style={{ ...inputStyle }}
+          style={inp}
           value={location}
           onChange={(e) => setLocation(e.target.value)}
         >
@@ -182,17 +182,17 @@ export default function ItemList({ user, onClaim }) {
           ))}
         </select>
         <button
-          onClick={handleSearch}
+          onClick={search}
           style={{
             padding: "10px 22px",
-            background: c.teal,
-            color: c.bg,
+            background: `linear-gradient(135deg, ${c.blue}, ${c.blueDark})`,
+            color: "#fff",
             border: "none",
             borderRadius: 8,
             fontSize: 13,
             fontWeight: 700,
             cursor: "pointer",
-            transition: tr,
+            boxShadow: "0 3px 12px rgba(17,120,194,0.3)",
             whiteSpace: "nowrap",
             fontFamily: c.fh,
           }}
@@ -201,22 +201,20 @@ export default function ItemList({ user, onClaim }) {
         </button>
         {filtered && (
           <button
-            onClick={handleReset}
+            onClick={reset}
             style={{
               padding: "10px 16px",
-              background: "transparent",
-              border: `1px solid rgba(255,77,77,0.3)`,
+              background: c.redBg,
+              border: `1.5px solid #f5b8b4`,
               borderRadius: 8,
-              color: "#ff6b6b",
+              color: c.red,
               fontSize: 13,
               cursor: "pointer",
-              whiteSpace: "nowrap",
             }}
           >
             ✕ Reset
           </button>
         )}
-        {/* View toggle */}
         <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
           {["grid", "list"].map((v) => (
             <button
@@ -225,10 +223,10 @@ export default function ItemList({ user, onClaim }) {
               style={{
                 width: 34,
                 height: 34,
-                background: view === v ? c.surface2 : "transparent",
-                border: `1px solid ${view === v ? c.border2 : c.border}`,
+                background: view === v ? c.blueLight : "transparent",
+                border: `1.5px solid ${view === v ? c.border2 : c.border}`,
                 borderRadius: 6,
-                color: view === v ? c.text : c.text2,
+                color: view === v ? c.blue : c.text3,
                 fontSize: 14,
                 cursor: "pointer",
               }}
@@ -239,19 +237,11 @@ export default function ItemList({ user, onClaim }) {
         </div>
       </div>
 
-      {/* Results label */}
+      {/* Label */}
       <div style={{ marginBottom: 16 }}>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: c.text3,
-            letterSpacing: "1px",
-            textTransform: "uppercase",
-          }}
-        >
+        <span style={g.sectionHead}>
           {filtered
-            ? `${items.length} result${items.length !== 1 ? "s" : ""}`
+            ? `${items.length} result${items.length !== 1 ? "s" : ""} found`
             : "All Items"}
         </span>
       </div>
@@ -263,7 +253,7 @@ export default function ItemList({ user, onClaim }) {
             style={{
               width: 36,
               height: 36,
-              border: `3px solid ${c.teal}`,
+              border: `3px solid ${c.blue}`,
               borderTopColor: "transparent",
               borderRadius: "50%",
               animation: "spin 0.8s linear infinite",
@@ -279,15 +269,17 @@ export default function ItemList({ user, onClaim }) {
         <div style={g.empty}>
           <span style={g.emptyIcon}>🔍</span>
           <p style={g.emptyTitle}>
-            {filtered ? "No results found" : "No items registered yet"}
+            {filtered ? "No results found" : "No items yet"}
           </p>
           <p style={g.emptySub}>
-            {filtered ? "Try different filters." : "Check back later."}
+            {filtered
+              ? "Try different search terms or filters."
+              : "Items will appear here once registered."}
           </p>
         </div>
       )}
 
-      {/* Grid */}
+      {/* Grid view */}
       {!loading && items.length > 0 && view === "grid" && (
         <div
           style={{
@@ -303,34 +295,27 @@ export default function ItemList({ user, onClaim }) {
                 key={item.item_id}
                 className="fade-up"
                 style={{
-                  ...g.card,
+                  background: "#fff",
+                  border: `1.5px solid ${c.border}`,
+                  borderRadius: 12,
+                  padding: "18px 20px 16px",
+                  boxShadow: "0 2px 10px rgba(17,120,194,0.06)",
                   display: "flex",
                   flexDirection: "column",
                   animationDelay: `${i * 0.04}s`,
                   transition: tr,
-                  cursor: "default",
                 }}
               >
-                {/* Top row */}
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
                     justifyContent: "space-between",
+                    alignItems: "center",
                     marginBottom: 12,
                   }}
                 >
                   {item.category ? (
-                    <span
-                      style={{
-                        padding: "4px 10px",
-                        borderRadius: 99,
-                        background: "rgba(77,159,255,0.12)",
-                        color: c.blue,
-                        fontSize: 10,
-                        fontWeight: 600,
-                      }}
-                    >
+                    <span style={g.badge(c.blueLight, c.blueDark)}>
                       {item.category}
                     </span>
                   ) : (
@@ -346,7 +331,7 @@ export default function ItemList({ user, onClaim }) {
                       background: sc.bg,
                       color: sc.color,
                       fontSize: 10,
-                      fontWeight: 600,
+                      fontWeight: 700,
                     }}
                   >
                     <span
@@ -361,16 +346,14 @@ export default function ItemList({ user, onClaim }) {
                     {item.status}
                   </span>
                 </div>
-
-                {/* Title & desc */}
                 <h3
                   style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    color: c.text,
-                    marginBottom: 8,
-                    lineHeight: 1.35,
                     fontFamily: c.fh,
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: c.dark,
+                    marginBottom: 8,
+                    lineHeight: 1.3,
                   }}
                 >
                   {item.title}
@@ -386,8 +369,6 @@ export default function ItemList({ user, onClaim }) {
                 >
                   {item.description}
                 </p>
-
-                {/* Meta */}
                 <div
                   style={{
                     display: "flex",
@@ -410,23 +391,22 @@ export default function ItemList({ user, onClaim }) {
                     })}
                   </span>
                 </div>
-
-                {/* Claim btn */}
                 {canClaim && (
                   <button
                     onClick={() => onClaim(item)}
                     style={{
                       width: "100%",
                       padding: "10px",
-                      background: "rgba(0,229,176,0.10)",
-                      border: `1px solid rgba(0,229,176,0.22)`,
+                      background: `linear-gradient(135deg, ${c.blue}, ${c.blueDark})`,
+                      color: "#fff",
+                      border: "none",
                       borderRadius: 8,
-                      color: c.teal,
                       fontSize: 13,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       cursor: "pointer",
-                      transition: tr,
                       fontFamily: c.fh,
+                      transition: tr,
+                      boxShadow: "0 3px 10px rgba(17,120,194,0.25)",
                     }}
                   >
                     Claim This Item →
@@ -448,12 +428,15 @@ export default function ItemList({ user, onClaim }) {
                 key={item.item_id}
                 className="fade-up"
                 style={{
-                  ...g.card,
+                  background: "#fff",
+                  border: `1.5px solid ${c.border}`,
+                  borderRadius: 10,
                   padding: "14px 20px",
                   display: "flex",
                   alignItems: "center",
                   gap: 16,
                   flexWrap: "wrap",
+                  boxShadow: "0 1px 6px rgba(17,120,194,0.05)",
                   animationDelay: `${i * 0.03}s`,
                 }}
               >
@@ -468,37 +451,34 @@ export default function ItemList({ user, onClaim }) {
                   >
                     <h3
                       style={{
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: c.text,
                         fontFamily: c.fh,
+                        fontSize: 14,
+                        fontWeight: 700,
+                        color: c.dark,
                       }}
                     >
                       {item.title}
                     </h3>
                     <span
                       style={{
-                        ...g.badge(sc.bg, sc.color),
                         padding: "2px 8px",
+                        borderRadius: 99,
+                        background: sc.bg,
+                        color: sc.color,
                         fontSize: 10,
+                        fontWeight: 700,
                       }}
                     >
                       {item.status}
                     </span>
                     {item.category && (
-                      <span
-                        style={{
-                          ...g.badge("rgba(77,159,255,0.12)", c.blue),
-                          padding: "2px 8px",
-                          fontSize: 10,
-                        }}
-                      >
+                      <span style={g.badge(c.blueLight, c.blueDark)}>
                         {item.category}
                       </span>
                     )}
                   </div>
                   <p style={{ fontSize: 11, color: c.text3 }}>
-                    📍 {item.location_found} ·{" "}
+                    📍 {item.location_found} · 🕐{" "}
                     {new Date(item.found_at).toLocaleDateString()}
                   </p>
                 </div>
@@ -518,14 +498,15 @@ export default function ItemList({ user, onClaim }) {
                     onClick={() => onClaim(item)}
                     style={{
                       padding: "8px 18px",
-                      background: "rgba(0,229,176,0.10)",
-                      border: `1px solid rgba(0,229,176,0.22)`,
+                      background: c.blueLight,
+                      border: `1.5px solid ${c.border2}`,
                       borderRadius: 8,
-                      color: c.teal,
+                      color: c.blue,
                       fontSize: 12,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       cursor: "pointer",
                       whiteSpace: "nowrap",
+                      fontFamily: c.fh,
                     }}
                   >
                     Claim →
