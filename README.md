@@ -1,6 +1,8 @@
 # FAST Peshawar — Lost & Found Intelligence System
 
 > A full-stack web application that digitizes the Lost & Found workflow at FAST Peshawar campus, replacing the manual register-based system at the Student Affairs office with a structured, database-driven solution.
+> Live Demo: https://lost-found-intelligence.vercel.app/
+
 
 ---
 
